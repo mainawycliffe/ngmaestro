@@ -1,101 +1,81 @@
-# NgLens
+# 🔍 ng-lens
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+> AI-powered Angular documentation assistant with semantic search and intelligent answers
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+**ng-lens** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## ✨ Features
 
-## Run tasks
+- 🤖 **AI-Powered Answers** - Get instant, contextual answers from Angular documentation
+- 📚 **Multi-Version Support** - Query docs for Angular 18, 19, and 20
+- 💬 **Three Modes**:
+  - **Ask Questions** - Learn Angular concepts quickly
+  - **Paste Errors** - Understand and fix error messages
+  - **Code Review** - Get feedback with best practices
 
-To run the dev server for your app, use:
+## 🏗️ Tech Stack
 
-```sh
-npx nx serve ui
+- **Frontend**: Angular 20 (standalone components, signals, zoneless)
+- **Backend**: Firebase (Genkit, Firestore, Cloud Functions)
+- **AI**: Google Gemini 2.5 Flash with built-in embeddings
+- **UI**: Angular Material 3 with custom theme
+- **Build**: Nx monorepo with SSR support
+- **Styling**: SCSS with Material You design tokens
+
+## 🚀 Getting Started
+
+```bash
+# Clone and install
+git clone https://github.com/mainawycliffe/ng-lens.git
+cd ng-lens
+pnpm install
+
+# Run dev server
+pnpm nx serve ui
+
+# Build for production
+pnpm nx build ui
 ```
 
-To create a production bundle:
 
-```sh
-npx nx build ui
-```
+## 🤝 Contributing
 
-To see all available targets to run for a project, run:
+Contributions are welcome! Please:
 
-```sh
-npx nx show project ui
-```
+1. Fork the repo and create a feature branch
+2. Follow Angular best practices (standalone components, signals, OnPush)
+3. Use [Conventional Commits](https://www.conventionalcommits.org/)
+4. Test your changes: `pnpm nx test ui && pnpm nx lint ui`
+5. Submit a PR
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 🛣️ Roadmap
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- [ ] Backend integration (Firebase Genkit + Firestore)
+- [ ] Vector search implementation
+- [ ] Angular docs crawler
+- [ ] Dark mode
+- [ ] CLI tool
+- [ ] VS Code extension
 
-## Add new projects
+## 📝 License
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Use the plugin's generator to create new projects.
+## 👨‍💻 Author
 
-To generate a new application, use:
+**Maina Wycliffe**
 
-```sh
-npx nx g @nx/angular:app demo
-```
+- Website: [mainawycliffe.dev](https://mainawycliffe.dev)
+- GitHub: [@mainawycliffe](https://github.com/mainawycliffe)
+- Twitter: [@mainawycliffe](https://twitter.com/mainawycliffe)
 
-To generate a new library, use:
+## ⭐ Show Your Support
 
-```sh
-npx nx g @nx/angular:lib mylib
-```
+Give a ⭐ if this project helped you!
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+<p align="center">
+  Made with ❤️ by <a href="https://mainawycliffe.dev">Maina Wycliffe</a>
+</p>
