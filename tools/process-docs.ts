@@ -1,12 +1,16 @@
 import { googleAI } from '@genkit-ai/google-genai';
-import { initializeApp } from 'firebase-admin/app';
+import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { Document, genkit } from 'genkit';
 import { join } from 'path';
 
 // Initialize Firebase
-initializeApp();
+initializeApp({
+  credential: applicationDefault(),
+  projectId: 'ng-lens',
+});
+
 const db = getFirestore();
 
 // Initialize Genkit
