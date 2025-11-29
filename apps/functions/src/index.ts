@@ -3,6 +3,7 @@ import { googleAI } from '@genkit-ai/google-genai';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { onCallGenkit } from 'firebase-functions/https';
+import { defineSecret } from 'firebase-functions/params';
 import { genkit, z } from 'genkit';
 
 initializeApp();
@@ -12,6 +13,8 @@ const ai = genkit({
   plugins: [googleAI()],
   model: googleAI.model('gemini-2.5-flash'),
 });
+
+const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
 
 const angularDocsRetriever = defineFirestoreRetriever(ai, {
   name: 'angularDocsRetriever',
@@ -40,7 +43,8 @@ function buildPrompt(
 ) {
   const baseSystem = `You are ng-lens, an AI-powered Angular documentation assistant specialized in Angular ${angularVersion}.
 
-You provide accurate, concise answers based on the official Angular documentation provided in the context below.`;
+You provide accurate, concise answers strictly based on the official Angular documentation provided in the context below.
+Do not use outside knowledge to answer the question if it is not supported by the context.`;
 
   const modeInstructions = {
     question: `
@@ -50,7 +54,7 @@ When answering questions:
 - Use ONLY information from the provided context
 - Focus on Angular ${angularVersion} best practices
 - Include code examples from the context when relevant
-- If the context doesn't contain the answer, say so clearly`,
+- If the context doesn't contain the answer, state that the information is not available in the provided documentation.`,
 
     error: `
 
@@ -59,7 +63,7 @@ When analyzing errors:
 - Explain what the error means in simple terms
 - Provide step-by-step solutions based on the context
 - Include relevant code fixes from the documentation
-- If the context lacks information, acknowledge it`,
+- If the context lacks information, state that the information is not available in the provided documentation.`,
 
     review: `
 
@@ -68,12 +72,13 @@ When reviewing code:
 - Check for: standalone components, signals, input()/output(), OnPush
 - Identify accessibility and performance issues
 - Provide specific, actionable feedback
-- Reference relevant documentation sections from the context`,
+- Reference relevant documentation sections from the context
+- If the context lacks information, state that the information is not available in the provided documentation.`,
   };
 
   const contextSection = context
     ? `\n\nRELEVANT DOCUMENTATION:\n${context}\n`
-    : '\n\nNOTE: No specific documentation context was found. Provide a general answer based on Angular best practices.\n';
+    : '\n\nNOTE: No specific documentation context was found. State that you cannot answer based on the provided documentation.\n';
 
   const userPrompts = {
     question: `${contextSection}\nQUESTION: ${query}`,
@@ -98,10 +103,15 @@ const theOracleFlow = ai.defineFlow(
   },
   async (input) => {
     const { query, angularVersion, mode } = input;
+    const formattedVersion = `v${angularVersion}`;
 
     const relevantDocs = await ai.retrieve({
       retriever: angularDocsRetriever,
-      options: { version: angularVersion },
+      options: {
+        where: {
+          version: formattedVersion,
+        },
+      },
       query: query,
     });
 
@@ -132,4 +142,9 @@ const theOracleFlow = ai.defineFlow(
   }
 );
 
-export const theOracle = onCallGenkit(theOracleFlow);
+export const theOracle = onCallGenkit(
+  {
+    secrets: [GEMINI_API_KEY],
+  },
+  theOracleFlow
+);

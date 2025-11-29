@@ -1,9 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { HeaderComponent } from './components/header.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { FooterComponent } from './components/footer.component';
-import { ModeSelectorComponent, type Mode } from './components/mode-selector.component';
+import { HeaderComponent } from './components/header.component';
 import { ModeInputComponent } from './components/mode-input.component';
+import {
+  ModeSelectorComponent,
+  type Mode,
+} from './components/mode-selector.component';
 import { ResponseDisplayComponent } from './components/response-display.component';
+import { OracleService } from './services/oracle.service';
 
 interface AngularVersion {
   value: string;
@@ -65,38 +76,43 @@ interface AngularVersion {
       <app-footer />
     </div>
   `,
-  styles: [`
-    .app-container {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #fef5f7 0%, #f8e8eb 100%);
-    }
-
-    .main-content {
-      flex: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-
-      @media (min-width: 768px) {
-        padding: 3rem 2rem;
+  styles: [
+    `
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #fef5f7 0%, #f8e8eb 100%);
       }
-    }
-  `],
+
+      .main-content {
+        flex: 1;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+
+        @media (min-width: 768px) {
+          padding: 3rem 2rem;
+        }
+      }
+    `,
+  ],
 })
 export class App {
+  private oracleService = inject(OracleService);
+
   // State signals
   selectedMode = signal<Mode>('question');
-  selectedVersion = signal<string>('20');
+  selectedVersion = signal<string>('21');
   inputText = signal<string>('');
   isLoading = signal<boolean>(false);
   response = signal<string>('');
 
   // Available Angular versions
   angularVersions: AngularVersion[] = [
-    { value: '20', label: 'Angular 20 (Latest)' },
+    { value: '21', label: 'Angular 21 (Latest)' },
+    { value: '20', label: 'Angular 20' },
     { value: '19', label: 'Angular 19' },
     { value: '18', label: 'Angular 18' },
   ];
@@ -140,7 +156,8 @@ export class App {
           title: 'Code Review',
           description: 'Get feedback on your Angular code with best practices',
           label: 'Your Angular code',
-          placeholder: 'Paste your Angular component, service, or module code here...',
+          placeholder:
+            'Paste your Angular component, service, or module code here...',
           buttonText: 'Review Code',
           icon: 'rate_review',
           ariaLabel: 'Paste your Angular code for review',
@@ -153,21 +170,28 @@ export class App {
     }
   });
 
-  handleSubmit(): void {
+  async handleSubmit(): Promise<void> {
     const input = this.inputText().trim();
     if (!input) return;
 
     this.isLoading.set(true);
     this.response.set('');
 
-    // TODO: Call backend API
-    // Simulating API call for now
-    setTimeout(() => {
-      this.isLoading.set(false);
-      this.response.set(
-        'This is a placeholder response. Backend integration coming soon!'
+    try {
+      const result = await firstValueFrom(
+        this.oracleService.ask({
+          query: input,
+          angularVersion: this.selectedVersion(),
+          mode: this.selectedMode(),
+        })
       );
-    }, 1500);
+      this.response.set(result.response);
+    } catch (error) {
+      console.error('Error calling Oracle:', error);
+      this.response.set('Sorry, something went wrong. Please try again.');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   clearInput(): void {
