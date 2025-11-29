@@ -10,8 +10,8 @@ import {QuestionBase} from './question-base';
   imports: [ReactiveFormsModule],
 })
 export class DynamicFormQuestionComponent {
-  readonly question = input.required<QuestionBase<string>>();
-  readonly form = input.required<FormGroup>();
+  question = input.required<QuestionBase<string>>();
+  form = input.required<FormGroup>();
 
   get isValid() {
     return this.form().controls[this.question().key].valid;

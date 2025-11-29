@@ -1,4 +1,5 @@
 import {Component, inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
 import {HousingService} from '../housing.service';
 import {HousingLocationInfo} from '../housinglocation';
@@ -6,7 +7,7 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-details',
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <article>
       <img

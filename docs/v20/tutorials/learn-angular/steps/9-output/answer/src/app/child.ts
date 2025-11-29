@@ -8,7 +8,7 @@ import {Component, output} from '@angular/core';
   `,
 })
 export class Child {
-  readonly addItemEvent = output<string>();
+  addItemEvent = output<string>();
 
   addItem() {
     this.addItemEvent.emit('🐢');

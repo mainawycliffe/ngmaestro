@@ -19,7 +19,7 @@ If you're starting a new project, you'll most likely want to create a local proj
 
 ### Prerequisites
 
-- **Node.js** - [v20.19.0 or newer](/reference/versions)
+- **Node.js** - [v20.11.1 or newer](/reference/versions)
 - **Text editor** - We recommend [Visual Studio Code](https://code.visualstudio.com/)
 - **Terminal** - Required for running Angular CLI commands
 - **Development Tool** - To improve your development workflow, we recommend the [Angular Language Service](/tools/language-service)
@@ -35,25 +35,21 @@ Open a terminal (if you're using [Visual Studio Code](https://code.visualstudio.
 <docs-code-multifile>
   <docs-code
     header="npm"
-    language="shell"
     >
     npm install -g @angular/cli
     </docs-code>
   <docs-code
     header="pnpm"
-    language="shell"
     >
     pnpm install -g @angular/cli
     </docs-code>
   <docs-code
     header="yarn"
-    language="shell"
     >
     yarn global add @angular/cli
     </docs-code>
   <docs-code
     header="bun"
-    language="shell"
     >
     bun install -g @angular/cli
     </docs-code>
@@ -78,7 +74,7 @@ If you don't have any preferences, just hit the enter key to take the default op
 
 After you select the configuration options and the CLI runs through the setup, you should see the following message:
 
-```text
+```shell
 ✔ Packages installed successfully.
     Successfully initialized git.
 ```
@@ -95,7 +91,7 @@ cd my-first-angular-app
 
 </docs-code>
 
-All of your dependencies should be installed at this point (which you can verify by checking for the existence of a `node_modules` folder in your project), so you can start your project by running the command:
+All of your dependencies should be installed at this point (which you can verify by checking for the existent for a `node_modules` folder in your project), so you can start your project by running the command:
 
 <docs-code language="shell">
 
@@ -105,7 +101,7 @@ npm start
 
 If everything is successful, you should see a similar confirmation message in your terminal:
 
-```text
+```shell
 Watch mode enabled. Watching for file changes...
 NOTE: Raw file sizes do not reflect development server per-request transformations.
   ➜  Local:   http://localhost:4200/

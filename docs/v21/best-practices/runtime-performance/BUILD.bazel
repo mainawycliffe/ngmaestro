@@ -1,0 +1,11 @@
+load("//adev/shared-docs:index.bzl", "generate_guides")
+
+generate_guides(
+    name = "runtime-performance",
+    srcs = glob([
+        "*.md",
+    ]),
+    api_manifest = "//adev/src/assets:docs_api_manifest",
+    mermaid_blocks = True,
+    visibility = ["//adev:__subpackages__"],
+)

@@ -23,7 +23,7 @@ Here's an example of how to use the `@if` syntax in a component:
     }
   `,
 })
-export class App {
+class App {
   isLoggedIn = true;
 }
 ```

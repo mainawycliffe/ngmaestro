@@ -1,0 +1,15 @@
+load("//adev/shared-docs:index.bzl", "generate_guides")
+
+generate_guides(
+    name = "ai",
+    srcs = glob([
+        "*.md",
+    ]),
+    api_manifest = "//adev/src/assets:docs_api_manifest",
+    data = [
+        "//adev/src/assets/images:what_is_angular.svg",
+        "//adev/src/context",
+        "//packages/core/resources:best-practices.md",
+    ],
+    visibility = ["//adev:__subpackages__"],
+)

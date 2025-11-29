@@ -17,14 +17,10 @@ ng generate @angular/core:self-closing-tag
 
 <docs-code language="angular-html">
 
+<!-- Before -->
 <hello-world></hello-world>
 
-</docs-code>
-
-#### After
-
-<docs-code language="angular-html">
-
+<!-- After -->
 <hello-world />
 
 </docs-code>

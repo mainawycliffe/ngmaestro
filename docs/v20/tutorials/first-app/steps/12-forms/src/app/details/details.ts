@@ -1,10 +1,12 @@
 import {Component, inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {ActivatedRoute} from '@angular/router';
 import {HousingService} from '../housing.service';
 import {HousingLocationInfo} from '../housinglocation';
 
 @Component({
   selector: 'app-details',
+  imports: [CommonModule],
   template: `
     <article>
       <img

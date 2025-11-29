@@ -28,6 +28,7 @@ describe('AppComponent & router testing', () => {
       Object.assign({}, appConfig, {
         providers: [
           {provide: HeroService, useClass: TestHeroService},
+          UserService,
           TwainService,
           provideHttpClient(),
           provideLocationMocks(),

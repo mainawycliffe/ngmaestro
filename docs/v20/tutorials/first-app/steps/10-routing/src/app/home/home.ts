@@ -1,10 +1,11 @@
 import {Component, inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {HousingLocation} from '../housing-location/housing-location';
 import {HousingLocationInfo} from '../housinglocation';
 import {HousingService} from '../housing.service';
 @Component({
   selector: 'app-home',
-  imports: [HousingLocation],
+  imports: [CommonModule, HousingLocation],
   template: `
     <section>
       <form>
@@ -13,9 +14,10 @@ import {HousingService} from '../housing.service';
       </form>
     </section>
     <section class="results">
-      @for(housingLocation of housingLocationList; track $index) {
-        <app-housing-location [housingLocation]="housingLocation"></app-housing-location>
-      }
+      <app-housing-location
+        *ngFor="let housingLocation of housingLocationList"
+        [housingLocation]="housingLocation"
+      ></app-housing-location>
     </section>
   `,
   styleUrls: ['./home.css'],

@@ -24,17 +24,7 @@ const userResource = resource({
 });
 
 // Create a computed signal based on the result of the resource's loader function.
-const firstName = computed(() => {
-  if (userResource.hasValue()) {
-    // `hasValue` serves 2 purposes:
-    // - It acts as type guard to strip `undefined` from the type
-    // - If protects against reading a throwing `value` when the resource is in error state
-    return userResource.value().firstName;
-  }
-
-  // fallback in case the resource value is `undefined` or if the resource is in error state
-  return undefined;
-});
+const firstName = computed(() => userResource.value().firstName);
 ```
 
 The `resource` function accepts a `ResourceOptions` object with two main properties: `params` and `loader`.
@@ -115,7 +105,7 @@ The `status` signal provides a specific `ResourceStatus` that describes the stat
 | ------------- | :---------------- | ---------------------------------------------------------------------------- |
 | `'idle'`      | `undefined`       | The resource has no valid request and the loader has not run.                |
 | `'error'`     | `undefined`       | The loader has encountered an error.                                         |
-| `'loading'`   | `undefined`       | The loader is running as a result of the `params` value changing.           |
+| `'loading'`   | `undefined`       | The loader is running as a result of the `request` value changing.           |
 | `'reloading'` | Previous value    | The loader is running as a result calling of the resource's `reload` method. |
 | `'resolved'`  | Resolved value    | The loader has completed.                                                    |
 | `'local'`     | Locally set value | The resource's value has been set locally via `.set()` or `.update()`        |

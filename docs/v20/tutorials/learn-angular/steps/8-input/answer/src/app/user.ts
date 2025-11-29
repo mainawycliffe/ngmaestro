@@ -7,5 +7,5 @@ import {Component, input} from '@angular/core';
   `,
 })
 export class User {
-  readonly name = input<string>();
+  name = input<string>();
 }

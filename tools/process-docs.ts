@@ -1,8 +1,8 @@
-import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { readFileSync, readdirSync, statSync } from 'fs';
+import { Document, genkit } from 'genkit';
 import { join } from 'path';
 
 // Initialize Firebase
@@ -12,32 +12,75 @@ const db = getFirestore();
 // Initialize Genkit
 const ai = genkit({
   plugins: [googleAI()],
-  model: googleAI.model('gemini-2.5-flash'),
 });
 
-// Define the embedder model
 const embedder = googleAI.embedder('text-embedding-004');
 
-interface DocChunk {
-  id: string;
-  version: string;
-  path: string;
-  title: string;
-  content: string;
-  embedding: number[];
-  metadata: {
-    section: string;
-    url: string;
-    tokens: number;
-  };
-  createdAt: Date;
-}
+// Define the indexer
+const angularDocsIndexer = ai.defineIndexer(
+  {
+    name: 'angularDocsIndexer',
+  },
+  async (docs) => {
+    const batch = db.batch();
+    let batchCount = 0;
+
+    // Generate embeddings for all docs in this batch
+    const embeddings = await Promise.all(
+      docs.map((d) => ai.embed({ embedder, content: d.text }))
+    );
+
+    for (let i = 0; i < docs.length; i++) {
+      const doc = docs[i];
+      const { version, path, section, url, tokens } = doc.metadata || {};
+
+      // Handle potential array response or single object
+      const result = embeddings[i];
+      const embedding = Array.isArray(result)
+        ? result[0].embedding
+        : (result as any).embedding;
+
+      // Create a deterministic ID
+      const docId =
+        doc.metadata?.id ||
+        `${version}_${path.replace(/[/.]/g, '-')}_${Date.now()}`;
+
+      const docRef = db.collection('angular-docs').doc(docId);
+
+      batch.set(docRef, {
+        id: docId,
+        version,
+        path,
+        content: doc.text,
+        embedding: FieldValue.vector(embedding),
+        metadata: {
+          section,
+          url,
+          tokens,
+        },
+        createdAt: new Date(),
+      });
+
+      batchCount++;
+      if (batchCount >= 450) {
+        await batch.commit();
+        console.log(`    Committed batch of ${batchCount} chunks`);
+        batchCount = 0;
+      }
+    }
+
+    if (batchCount > 0) {
+      await batch.commit();
+      console.log(`    Committed final batch of ${batchCount} chunks`);
+    }
+  }
+);
 
 // Parse markdown frontmatter and content
 function parseMarkdown(content: string, filePath: string) {
-  const lines = content.split('\n');
+  // const lines = content.split('\n'); // Unused
   let title = filePath.split('/').pop()?.replace('.md', '') || 'Untitled';
-  
+
   // Extract title from first h1 or filename
   const h1Match = content.match(/^#\s+(.+)$/m);
   if (h1Match) {
@@ -51,13 +94,13 @@ function parseMarkdown(content: string, filePath: string) {
 function chunkContent(content: string, maxTokens = 500): string[] {
   const chunks: string[] = [];
   const paragraphs = content.split(/\n\n+/);
-  
+
   let currentChunk = '';
   let currentTokens = 0;
 
   for (const paragraph of paragraphs) {
     const paragraphTokens = Math.ceil(paragraph.length / 4); // Rough token estimate
-    
+
     if (currentTokens + paragraphTokens > maxTokens && currentChunk) {
       chunks.push(currentChunk.trim());
       currentChunk = paragraph;
@@ -81,7 +124,7 @@ function getMarkdownFiles(versionDir: string): string[] {
 
   function traverse(dir: string) {
     const items = readdirSync(dir);
-    
+
     for (const item of items) {
       const fullPath = join(dir, item);
       const stat = statSync(fullPath);
@@ -98,40 +141,34 @@ function getMarkdownFiles(versionDir: string): string[] {
   return files;
 }
 
-// Generate embedding for a text chunk
-async function generateEmbedding(text: string): Promise<number[] | undefined> {
-  try {
-    const result = await ai.embed({
-      embedder,
-      content: text,
-    });
-    
-    return result.embedding;
-  } catch (error) {
-    console.error('    Error generating embedding:', error);
-    return undefined;
-  }
-}
-
 // Process a single version's documentation
 async function processVersion(version: string, docsPath: string) {
   console.log(`\nProcessing Angular ${version}...`);
-  
+
   const versionDir = join(docsPath, version);
+
+  // Check if directory exists
+  try {
+    statSync(versionDir);
+  } catch {
+    console.warn(
+      `Directory for ${version} not found at ${versionDir}. Skipping.`
+    );
+    return;
+  }
+
   const files = getMarkdownFiles(versionDir);
-  
   console.log(`Found ${files.length} markdown files`);
 
   let processedCount = 0;
-  const batch = db.batch();
-  let batchCount = 0;
+  const documents: Document[] = [];
 
   for (const filePath of files) {
     try {
       const content = readFileSync(filePath, 'utf-8');
       const relativePath = filePath.replace(versionDir + '/', '');
       const section = relativePath.split('/')[0];
-      
+
       const { title } = parseMarkdown(content, filePath);
       const chunks = chunkContent(content);
 
@@ -139,73 +176,57 @@ async function processVersion(version: string, docsPath: string) {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        
-        // Generate embedding
-        const embedding = await generateEmbedding(chunk);
-        
-        // Skip if embedding generation failed
-        if (!embedding) {
-          console.error(`    Skipping chunk ${i} - embedding generation failed`);
-          continue;
-        }
-
-        // Create a sanitized document ID (replace special chars)
         const sanitizedPath = relativePath.replace(/[/.]/g, '-');
         const docId = `${version}_${sanitizedPath}_${i}`;
 
-        const docChunk: DocChunk = {
-          id: docId,
-          version,
-          path: relativePath,
-          title,
-          content: chunk,
-          embedding,
-          metadata: {
-            section,
-            url: `https://angular.dev/${relativePath.replace('.md', '')}`,
-            tokens: Math.ceil(chunk.length / 4),
-          },
-          createdAt: new Date(),
-        };
-
-        const docRef = db.collection('angular-docs').doc(docId);
-        batch.set(docRef, docChunk);
-        
-        batchCount++;
-        
-        // Firestore batch limit is 500 operations
-        if (batchCount >= 450) {
-          await batch.commit();
-          console.log(`    Committed batch of ${batchCount} chunks`);
-          batchCount = 0;
-        }
+        documents.push(
+          new Document({
+            content: [{ text: chunk }],
+            metadata: {
+              id: docId,
+              version,
+              path: relativePath,
+              title,
+              section,
+              url: `https://angular.dev/${relativePath.replace('.md', '')}`,
+              tokens: Math.ceil(chunk.length / 4),
+            },
+          })
+        );
       }
 
       processedCount++;
-      
-      // Rate limiting - avoid hitting API limits
-      if (processedCount % 10 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Index in batches of 50 documents to avoid memory issues and show progress
+      if (documents.length >= 50) {
+        await ai.index({
+          indexer: angularDocsIndexer,
+          documents: [...documents], // Pass a copy
+        });
+        documents.length = 0; // Clear array
       }
-      
     } catch (error) {
       console.error(`  Error processing ${filePath}:`, error);
     }
   }
 
-  // Commit remaining items
-  if (batchCount > 0) {
-    await batch.commit();
-    console.log(`  Committed final batch of ${batchCount} chunks`);
+  // Index remaining documents
+  if (documents.length > 0) {
+    await ai.index({
+      indexer: angularDocsIndexer,
+      documents,
+    });
   }
 
-  console.log(`✓ Completed Angular ${version}: ${processedCount} files processed`);
+  console.log(
+    `✓ Completed Angular ${version}: ${processedCount} files processed`
+  );
 }
 
 // Main execution
 async function main() {
   const docsPath = join(process.cwd(), 'docs');
-  const versions = ['v18', 'v19', 'v20'];
+  const versions = ['v18', 'v19', 'v20', 'v21'];
 
   console.log('Starting Angular documentation processing...');
   console.log('Docs path:', docsPath);

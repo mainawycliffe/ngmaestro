@@ -1,5 +1,3 @@
-load("//adev/shared-docs:defaults.bzl", "copy_to_bin")
-
 # All example files.
 filegroup(
     name = "examples",
@@ -8,7 +6,7 @@ filegroup(
 )
 
 # Example files that can be embedded as preview components.
-copy_to_bin(
+filegroup(
     name = "embeddable",
     srcs = glob(
         ["**/app/**"],

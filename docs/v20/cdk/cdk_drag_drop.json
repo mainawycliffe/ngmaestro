@@ -135,6 +135,7 @@
     },
     {
       "name": "CdkDragStart",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -163,7 +164,6 @@
       "description": "Event emitted when the user starts dragging a draggable.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user starts dragging a draggable. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -246,6 +246,7 @@
     },
     {
       "name": "CdkDragRelease",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -274,7 +275,6 @@
       "description": "Event emitted when the user releases an item, before any animations have started.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user releases an item, before any animations have started. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -923,6 +923,7 @@
     },
     {
       "name": "CdkDragEnd",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -967,7 +968,6 @@
       "description": "Event emitted when the user stops dragging a draggable.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user stops dragging a draggable. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -977,11 +977,12 @@
     },
     {
       "name": "DragDropConfig",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
           "name": "lockAxis",
-          "type": "DragAxis | null | undefined",
+          "type": "DragAxis | undefined",
           "memberType": "property",
           "memberTags": [
             "optional"
@@ -1135,9 +1136,7 @@
       "description": "Object that can be used to configure the drag\nitems and drop lists within a module or a component.",
       "jsdocTags": [],
       "rawComment": "/**\n * Object that can be used to configure the drag\n * items and drop lists within a module or a component.\n */",
-      "extends": [
-        "Partial<DragRefConfig>"
-      ],
+      "extends": "Partial<DragRefConfig>",
       "implements": [],
       "source": {
         "filePath": "src/cdk/drag-drop/directives/config.ts",
@@ -1302,7 +1301,7 @@
         },
         {
           "name": "lockAxis",
-          "type": "DragAxis | null",
+          "type": "DragAxis",
           "memberType": "property",
           "memberTags": [],
           "description": "Locks the position of the draggable elements inside the container along the specified axis.",
@@ -1370,14 +1369,6 @@
           "memberType": "property",
           "memberTags": [],
           "description": "Selector that will be used to resolve an alternate element container for the drop list.\nPassing an alternate container is useful for the cases where one might not have control\nover the parent node of the draggable items within the list (e.g. due to content projection).\nThis allows for usages like:\n\n```\n<div cdkDropList cdkDropListElementContainer=\".inner\">\n  <div class=\"inner\">\n    <div cdkDrag></div>\n  </div>\n</div>\n```",
-          "jsdocTags": []
-        },
-        {
-          "name": "hasAnchor",
-          "type": "boolean",
-          "memberType": "property",
-          "memberTags": [],
-          "description": "By default when an item leaves its initial container, its placeholder will be transferred\nto the new container. If that's not desirable for your use case, you can enable this option\nwhich will clone the placeholder and leave it inside the original container. If the item is\nreturned to the initial container, the anchor element will be removed automatically.\n\nThe cloned placeholder can be styled by targeting the `cdk-drag-anchor` class.\n\nThis option is useful in combination with `cdkDropListSortingDisabled` to implement copying\nbehavior in a drop list.",
           "jsdocTags": []
         },
         {
@@ -1600,11 +1591,12 @@
       "source": {
         "filePath": "/src/cdk/drag-drop/directives/drop-list.ts",
         "startLine": 36,
-        "endLine": 436
+        "endLine": 423
       }
     },
     {
       "name": "DragRefConfig",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -1648,7 +1640,6 @@
       "description": "Object that can be used to configure the behavior of DragRef.",
       "jsdocTags": [],
       "rawComment": "/** Object that can be used to configure the behavior of DragRef. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-ref.ts",
@@ -2401,6 +2392,7 @@
     },
     {
       "name": "CdkDragEnter",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -2441,7 +2433,6 @@
       "description": "Event emitted when the user moves an item into a new drop container.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user moves an item into a new drop container. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -2606,6 +2597,7 @@
     },
     {
       "name": "CdkDragExit",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -2638,7 +2630,6 @@
       "description": "Event emitted when the user removes an item from a\ndrop container by moving it into another one.",
       "jsdocTags": [],
       "rawComment": "/**\n * Event emitted when the user removes an item from a\n * drop container by moving it into another one.\n */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -2734,7 +2725,7 @@
         },
         {
           "name": "lockAxis",
-          "type": "\"x\" | \"y\" | null",
+          "type": "\"x\" | \"y\"",
           "memberType": "property",
           "memberTags": [],
           "description": "Locks the position of the draggable elements inside the container along the specified axis.",
@@ -2754,14 +2745,6 @@
           "memberType": "property",
           "memberTags": [],
           "description": "Number of pixels to scroll for each frame when auto-scrolling an element.",
-          "jsdocTags": []
-        },
-        {
-          "name": "hasAnchor",
-          "type": "boolean",
-          "memberType": "property",
-          "memberTags": [],
-          "description": "Whether the items in the list should leave an anchor node when leaving the initial container.",
           "jsdocTags": []
         },
         {
@@ -3876,70 +3859,6 @@
           "memberTags": []
         },
         {
-          "name": "getItemAtIndex",
-          "signatures": [
-            {
-              "name": "getItemAtIndex",
-              "entryType": "function",
-              "description": "Gets the item at a specific index.",
-              "generics": [],
-              "isNewType": false,
-              "jsdocTags": [
-                {
-                  "name": "param",
-                  "comment": "Index at which to retrieve the item."
-                }
-              ],
-              "params": [
-                {
-                  "name": "index",
-                  "description": "Index at which to retrieve the item.",
-                  "type": "number",
-                  "isOptional": false,
-                  "isRestParam": false
-                }
-              ],
-              "rawComment": "/**\n   * Gets the item at a specific index.\n   * @param index Index at which to retrieve the item.\n   */",
-              "returnType": "DragRef<any> | null"
-            }
-          ],
-          "implementation": {
-            "params": [
-              {
-                "name": "index",
-                "description": "Index at which to retrieve the item.",
-                "type": "number",
-                "isOptional": false,
-                "isRestParam": false
-              }
-            ],
-            "isNewType": false,
-            "returnType": "DragRef<any> | null",
-            "generics": [],
-            "name": "getItemAtIndex",
-            "description": "Gets the item at a specific index.",
-            "entryType": "function",
-            "jsdocTags": [
-              {
-                "name": "param",
-                "comment": "Index at which to retrieve the item."
-              }
-            ],
-            "rawComment": "/**\n   * Gets the item at a specific index.\n   * @param index Index at which to retrieve the item.\n   */"
-          },
-          "entryType": "function",
-          "description": "Gets the item at a specific index.",
-          "jsdocTags": [
-            {
-              "name": "param",
-              "comment": "Index at which to retrieve the item."
-            }
-          ],
-          "rawComment": "/**\n   * Gets the item at a specific index.\n   * @param index Index at which to retrieve the item.\n   */",
-          "memberType": "method",
-          "memberTags": []
-        },
-        {
           "name": "isReceiving",
           "signatures": [
             {
@@ -3986,7 +3905,7 @@
       "source": {
         "filePath": "/src/cdk/drag-drop/drop-list-ref.ts",
         "startLine": 55,
-        "endLine": 787
+        "endLine": 772
       }
     },
     {
@@ -4033,7 +3952,7 @@
         },
         {
           "name": "lockAxis",
-          "type": "DragAxis | null",
+          "type": "DragAxis",
           "memberType": "property",
           "memberTags": [],
           "description": "Locks the position of the dragged element along the specified axis.",
@@ -4553,7 +4472,7 @@
       "source": {
         "filePath": "/src/cdk/drag-drop/directives/drag.ts",
         "startLine": 61,
-        "endLine": 619
+        "endLine": 623
       }
     },
     {
@@ -4572,6 +4491,7 @@
     },
     {
       "name": "CdkDragDrop",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -4663,7 +4583,6 @@
       "description": "Event emitted when the user drops a draggable item inside a drop container.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user drops a draggable item inside a drop container. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -4673,6 +4592,7 @@
     },
     {
       "name": "CdkDragMove",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -4725,7 +4645,6 @@
       "description": "Event emitted as the user is dragging a draggable item.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted as the user is dragging a draggable item. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -4735,6 +4654,7 @@
     },
     {
       "name": "Point",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -4758,12 +4678,11 @@
       "description": "Point on the page or within an element.",
       "jsdocTags": [],
       "rawComment": "/** Point on the page or within an element. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-ref.ts",
-        "startLine": 102,
-        "endLine": 105
+        "startLine": 99,
+        "endLine": 102
       }
     },
     {
@@ -4776,12 +4695,13 @@
       "jsdocTags": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-ref.ts",
-        "startLine": 125,
-        "endLine": 125
+        "startLine": 122,
+        "endLine": 122
       }
     },
     {
       "name": "CdkDragSortEvent",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -4830,7 +4750,6 @@
       "description": "Event emitted when the user swaps the position of two drag items.",
       "jsdocTags": [],
       "rawComment": "/** Event emitted when the user swaps the position of two drag items. */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-events.ts",
@@ -4916,7 +4835,7 @@
         },
         {
           "name": "lockAxis",
-          "type": "\"x\" | \"y\" | null",
+          "type": "\"x\" | \"y\"",
           "memberType": "property",
           "memberTags": [],
           "description": "Axis along which dragging is locked.",
@@ -5966,8 +5885,8 @@
       "implements": [],
       "source": {
         "filePath": "/src/cdk/drag-drop/drag-ref.ts",
-        "startLine": 130,
-        "endLine": 1631
+        "startLine": 127,
+        "endLine": 1588
       }
     }
   ],
@@ -6545,10 +6464,6 @@
       "@angular/cdk/drag-drop"
     ],
     [
-      "CdkDropList.hasAnchor",
-      "@angular/cdk/drag-drop"
-    ],
-    [
       "CdkDropList.dropped",
       "@angular/cdk/drag-drop"
     ],
@@ -6725,10 +6640,6 @@
       "@angular/cdk/drag-drop"
     ],
     [
-      "DropListRef.hasAnchor",
-      "@angular/cdk/drag-drop"
-    ],
-    [
       "DropListRef.enterPredicate",
       "@angular/cdk/drag-drop"
     ],
@@ -6822,10 +6733,6 @@
     ],
     [
       "DropListRef.getItemIndex",
-      "@angular/cdk/drag-drop"
-    ],
-    [
-      "DropListRef.getItemAtIndex",
       "@angular/cdk/drag-drop"
     ],
     [

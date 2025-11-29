@@ -1,13 +1,12 @@
 // #docplaster
 import {Component, DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {provideRouter, Router, RouterLink, RouterOutlet} from '@angular/router';
+import {provideRouter, Router, RouterLink} from '@angular/router';
 
 import {AppComponent} from './app.component';
 import {appConfig} from './app.config';
 import {UserService} from './model';
-import {WelcomeComponent} from './welcome/welcome.component';
 
 // #docregion component-stubs
 @Component({selector: 'app-banner', template: ''})
@@ -24,67 +23,54 @@ let comp: AppComponent;
 let fixture: ComponentFixture<AppComponent>;
 
 describe('AppComponent & TestModule', () => {
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     // #docregion testbed-stubs
     TestBed.configureTestingModule(
       Object.assign({}, appConfig, {
+        imports: [
+          AppComponent,
+          BannerStubComponent,
+          RouterLink,
+          RouterOutletStubComponent,
+          WelcomeStubComponent,
+        ],
         providers: [provideRouter([]), UserService],
       }),
-    ).overrideComponent(AppComponent, {
-      set: {
-        imports: [BannerStubComponent, RouterLink, RouterOutletStubComponent, WelcomeStubComponent],
-      },
-    });
-    // #enddocregion testbed-stubs
+    )
+      // #enddocregion testbed-stubs
 
-    fixture = TestBed.createComponent(AppComponent);
-    comp = fixture.componentInstance;
-  });
+      .then(() => {
+        fixture = TestBed.createComponent(AppComponent);
+        comp = fixture.componentInstance;
+      });
+  }));
   tests();
 });
 
 //////// Testing w/ NO_ERRORS_SCHEMA //////
 describe('AppComponent & NO_ERRORS_SCHEMA', () => {
-  beforeEach(() => {
-    // #docregion no-errors-schema
+  beforeEach(waitForAsync(() => {
+    // #docregion no-errors-schema, mixed-setup
     TestBed.configureTestingModule(
       Object.assign({}, appConfig, {
+        imports: [
+          AppComponent,
+          // #enddocregion no-errors-schema
+          BannerStubComponent,
+          // #docregion no-errors-schema
+          RouterLink,
+        ],
         providers: [provideRouter([]), UserService],
-      }),
-    ).overrideComponent(AppComponent, {
-      set: {
-        imports: [], // resets all imports
         schemas: [NO_ERRORS_SCHEMA],
-      },
-    });
-    // #enddocregion no-errors-schema
-
-    fixture = TestBed.createComponent(AppComponent);
-    comp = fixture.componentInstance;
-  });
-  tests();
-});
-
-describe('AppComponent & NO_ERRORS_SCHEMA', () => {
-  beforeEach(() => {
-    // #docregion mixed-setup
-    TestBed.configureTestingModule(
-      Object.assign({}, appConfig, {
-        providers: [provideRouter([]), UserService],
       }),
-    ).overrideComponent(AppComponent, {
-      remove: {
-        imports: [RouterOutlet, WelcomeComponent],
-      },
-      set: {
-        schemas: [NO_ERRORS_SCHEMA],
-      },
-    });
-    // #enddocregion mixed-setup
+    )
+      // #enddocregion no-errors-schema, mixed-setup
 
-    fixture = TestBed.createComponent(AppComponent);
-    comp = fixture.componentInstance;
-  });
+      .then(() => {
+        fixture = TestBed.createComponent(AppComponent);
+        comp = fixture.componentInstance;
+      });
+  }));
   tests();
 });
 

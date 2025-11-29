@@ -1,5 +1,7 @@
 {
-  "compilerOptions": {},
+  "compilerOptions": {
+    "moduleResolution": "node"
+  },
   "include": ["src/**/*"],
   "extends": "../../tsconfig.base.json"
 }

@@ -28,7 +28,7 @@ describe('BannerComponent (external files)', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
         imports: [BannerComponent],
-      }).compileComponents(); // compile template and css
+      }); // compile template and css
     });
     // #enddocregion async-before-each
 

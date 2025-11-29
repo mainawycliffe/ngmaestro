@@ -6,5 +6,5 @@ import {Component, input} from '@angular/core';
   styleUrls: ['./profile.component.css'],
 })
 export class ProfileComponent {
-  readonly username = input.required<string>();
+  username = input.required<string>();
 }

@@ -6,6 +6,7 @@
   "entries": [
     {
       "name": "ProtractorHarnessEnvironmentOptions",
+      "isAbstract": false,
       "entryType": "interface",
       "members": [
         {
@@ -30,7 +31,6 @@
         }
       ],
       "rawComment": "/**\n * Options to configure the environment.\n * @deprecated\n * @breaking-change 13.0.0\n */",
-      "extends": [],
       "implements": [],
       "source": {
         "filePath": "/src/cdk/testing/protractor/protractor-harness-environment.ts",

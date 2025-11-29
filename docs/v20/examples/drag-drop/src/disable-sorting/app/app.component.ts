@@ -15,6 +15,7 @@ import {Component} from '@angular/core';
   selector: 'cdk-drag-drop-disabled-sorting-example',
   templateUrl: 'app.component.html',
   styleUrl: 'app.component.css',
+  standalone: true,
   imports: [CdkDropListGroup, CdkDropList, CdkDrag],
 })
 export class CdkDragDropDisabledSortingExample {

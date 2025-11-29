@@ -42,8 +42,8 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
   },
 })
 export class PopupComponent {
-  readonly message = input('');
-  readonly closed = output<void>();
+  message = input('');
+  closed = output<void>();
 
-  readonly state = computed(() => (this.message() ? 'opened' : 'closed'));
+  state = computed(() => (this.message() ? 'opened' : 'closed'));
 }

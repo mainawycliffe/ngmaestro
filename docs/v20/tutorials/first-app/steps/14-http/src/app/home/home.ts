@@ -1,11 +1,12 @@
 import {Component, inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {HousingLocation} from '../housing-location/housing-location';
 import {HousingLocationInfo} from '../housinglocation';
 import {HousingService} from '../housing.service';
 
 @Component({
   selector: 'app-home',
-  imports: [HousingLocation],
+  imports: [CommonModule, HousingLocation],
   template: `
     <section>
       <form>
@@ -14,9 +15,10 @@ import {HousingService} from '../housing.service';
       </form>
     </section>
     <section class="results">
-      @for(housingLocation of filteredLocationList; track $index) {
-        <app-housing-location [housingLocation]="housingLocation"></app-housing-location>
-      }
+      <app-housing-location
+        *ngFor="let housingLocation of filteredLocationList"
+        [housingLocation]="housingLocation"
+      ></app-housing-location>
     </section>
   `,
   styleUrls: ['./home.css'],
@@ -25,12 +27,10 @@ export class Home {
   housingLocationList: HousingLocationInfo[] = [];
   housingService: HousingService = inject(HousingService);
   filteredLocationList: HousingLocationInfo[] = [];
-
   constructor() {
     this.housingLocationList = this.housingService.getAllHousingLocations();
     this.filteredLocationList = this.housingLocationList;
   }
-
   filterResults(text: string) {
     if (!text) {
       this.filteredLocationList = this.housingLocationList;
