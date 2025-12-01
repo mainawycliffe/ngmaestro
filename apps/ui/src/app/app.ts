@@ -56,6 +56,7 @@ import { ChatStateService } from './services/chat-state.service';
             <app-response-display
               [isLoading]="chatState.isLoading()"
               [messages]="chatState.messages()"
+              (cancelRequest)="chatState.cancelRequest()"
             />
           </div>
         </div>

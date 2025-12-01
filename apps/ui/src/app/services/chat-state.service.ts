@@ -7,6 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ChatMessage, Mode } from '../models/chat.types';
 import { OracleInput, OracleService } from './oracle.service';
 
@@ -16,6 +17,7 @@ import { OracleInput, OracleService } from './oracle.service';
 export class ChatStateService {
   private oracleService = inject(OracleService);
   private platformId = inject(PLATFORM_ID);
+  private currentSubscription: Subscription | null = null;
 
   // State
   readonly selectedMode = signal<Mode>(this.getInitialMode());
@@ -223,11 +225,38 @@ export class ChatStateService {
     this.inputText.set(history[newIndex]);
   }
 
+  cancelRequest() {
+    if (this.currentSubscription) {
+      this.currentSubscription.unsubscribe();
+      this.currentSubscription = null;
+    }
+    this.isLoading.set(false);
+
+    // Mark the last message as cancelled if it's a pending model message
+    this.messages.update((msgs) => {
+      const lastMsg = msgs[msgs.length - 1];
+      if (lastMsg && lastMsg.role === 'model' && !lastMsg.content) {
+        const newMsgs = [...msgs];
+        newMsgs[newMsgs.length - 1] = {
+          ...lastMsg,
+          content: 'Request cancelled.',
+        };
+        return newMsgs;
+      }
+      return msgs;
+    });
+  }
+
   sendMessage() {
     const input = this.inputText().trim();
     const image = this.selectedImage();
 
     if (!input && !image) return;
+
+    // Cancel any pending request
+    if (this.currentSubscription) {
+      this.currentSubscription.unsubscribe();
+    }
 
     // Add to history if it's a text input
     if (input) {
@@ -265,7 +294,7 @@ export class ChatStateService {
       payload.image = image;
     }
 
-    this.oracleService.generate(payload).subscribe({
+    this.currentSubscription = this.oracleService.generate(payload).subscribe({
       next: (result) => {
         this.messages.update((msgs) => {
           const newMsgs = [...msgs];
@@ -273,6 +302,7 @@ export class ChatStateService {
           newMsgs[lastIdx] = {
             ...newMsgs[lastIdx],
             content: result.response.blocks,
+            sources: result.sources,
           };
           return newMsgs;
         });
@@ -289,9 +319,11 @@ export class ChatStateService {
           return newMsgs;
         });
         this.isLoading.set(false);
+        this.currentSubscription = null;
       },
       complete: () => {
         this.isLoading.set(false);
+        this.currentSubscription = null;
       },
     });
   }
