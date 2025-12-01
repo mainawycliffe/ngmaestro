@@ -1,81 +1,100 @@
-import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
-  effect,
+  HostListener,
   inject,
-  PLATFORM_ID,
   signal,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { FooterComponent } from './components/footer.component';
 import { HeaderComponent } from './components/header.component';
 import { ModeInputComponent } from './components/mode-input.component';
-import {
-  ModeSelectorComponent,
-  type Mode,
-} from './components/mode-selector.component';
 import { ResponseDisplayComponent } from './components/response-display.component';
-import { OracleService } from './services/oracle.service';
-
-interface AngularVersion {
-  value: string;
-  label: string;
-}
+import { ANGULAR_VERSIONS, AVAILABLE_MODES } from './config/chat.config';
+import { ChatStateService } from './services/chat-state.service';
 
 @Component({
   selector: 'app-root',
   imports: [
     HeaderComponent,
     FooterComponent,
-    ModeSelectorComponent,
     ModeInputComponent,
     ResponseDisplayComponent,
+    MatIconModule,
+    MatButtonModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="app-container">
+    <div class="app-container" (dragover)="onDragOver($event)">
+      @if (isDragging()) {
+      <div
+        class="drag-overlay"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div class="drag-content">
+          <mat-icon>cloud_upload</mat-icon>
+          <h2>Drop image to analyze</h2>
+        </div>
+      </div>
+      }
+
       <app-header
-        [selectedVersion]="selectedVersion()"
+        [selectedVersion]="chatState.selectedVersion()"
         [versions]="angularVersions"
-        (versionChange)="selectedVersion.set($event)"
+        [fontSize]="chatState.fontSize()"
+        [theme]="chatState.theme()"
+        (versionChange)="chatState.setVersion($event)"
+        (fontSizeChange)="chatState.setFontSize($event)"
+        (themeChange)="chatState.setTheme($event)"
       />
 
       <main class="main-content" role="main">
-        <app-mode-selector
-          [selectedMode]="selectedMode()"
-          (modeChange)="selectedMode.set($event)"
-        />
+        <div class="notebook-container">
+          <div class="content-wrapper">
+            <app-response-display
+              [isLoading]="chatState.isLoading()"
+              [messages]="chatState.messages()"
+            />
+          </div>
+        </div>
 
-        <div class="content-area">
-          <app-mode-input
-            [title]="modeConfig().title"
-            [description]="modeConfig().description"
-            [label]="modeConfig().label"
-            [placeholder]="modeConfig().placeholder"
-            [buttonText]="modeConfig().buttonText"
-            [icon]="modeConfig().icon"
-            [ariaLabel]="modeConfig().ariaLabel"
-            [submitLabel]="modeConfig().submitLabel"
-            [isCode]="modeConfig().isCode"
-            [rows]="modeConfig().rows"
-            [minRows]="modeConfig().minRows"
-            [maxRows]="modeConfig().maxRows"
-            [inputText]="inputText()"
-            (inputChange)="inputText.set($event)"
-            (submit)="handleSubmit()"
-            (clear)="clearInput()"
-          />
-
-          <app-response-display
-            [isLoading]="isLoading()"
-            [response]="response()"
-            [mode]="selectedMode()"
-          />
+        <div class="input-cell-container">
+          <div class="content-wrapper">
+            <app-mode-input
+              [title]="chatState.modeConfig().title"
+              [description]="chatState.modeConfig().description"
+              [label]="chatState.modeConfig().label"
+              [placeholder]="chatState.modeConfig().placeholder"
+              [buttonText]="chatState.modeConfig().buttonText"
+              [icon]="chatState.modeConfig().icon"
+              [ariaLabel]="chatState.modeConfig().ariaLabel"
+              [submitLabel]="chatState.modeConfig().submitLabel"
+              [isCode]="chatState.modeConfig().isCode"
+              [rows]="chatState.modeConfig().rows"
+              [minRows]="chatState.modeConfig().minRows"
+              [maxRows]="chatState.modeConfig().maxRows"
+              [inputText]="chatState.inputText()"
+              [modes]="availableModes"
+              [selectedMode]="chatState.selectedMode()"
+              [isCompact]="chatState.messages().length > 0"
+              [selectedImage]="chatState.selectedImage()"
+              [isLearnMode]="chatState.isLearnMode()"
+              (modeChange)="chatState.setMode($event)"
+              (inputChange)="chatState.setInputText($event)"
+              (imageSelected)="chatState.setImage($event)"
+              (submitAction)="sendMessage()"
+              (clear)="chatState.clearInput()"
+              (learnModeChange)="chatState.toggleLearnMode()"
+            />
+          </div>
         </div>
       </main>
 
+      @if (chatState.messages().length === 0) {
       <app-footer />
+      }
     </div>
   `,
   styles: [
@@ -83,143 +102,173 @@ interface AngularVersion {
       .app-container {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #fef5f7 0%, #f8e8eb 100%);
+        height: 100vh;
+        background-color: var(--mat-sys-background);
+        color: var(--mat-sys-on-background);
+        overflow: hidden;
       }
 
       .main-content {
         flex: 1;
-        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
         width: 100%;
-        margin: 0 auto;
-        padding: 2rem 1rem;
+        position: relative;
+        overflow-y: auto; /* Main scroll container */
+        scroll-behavior: smooth;
+
+        /* Notebook-like scrollbar */
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color: var(--mat-sys-outline-variant);
+          border-radius: 4px;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: var(--mat-sys-outline);
+        }
+      }
+
+      .notebook-container {
+        flex: 1;
+        /* overflow-y: auto; Removed internal scroll */
+        padding: 1rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center the wrapper */
 
         @media (min-width: 768px) {
-          padding: 3rem 2rem;
+          padding: 2rem 3rem;
+        }
+
+        @media (min-width: 1440px) {
+          padding: 2rem 5rem;
+        }
+      }
+
+      .input-cell-container {
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
+        width: 100%;
+        background: var(--mat-sys-background);
+        border-top: 1px solid var(--mat-sys-outline-variant);
+        padding: 1rem;
+        z-index: 10;
+        animation: fadeIn 0.3s ease-out;
+        display: flex;
+        justify-content: center; /* Center the wrapper */
+
+        @media (min-width: 768px) {
+          padding: 1.5rem 3rem;
+        }
+
+        @media (min-width: 1440px) {
+          padding: 1.5rem 5rem;
+        }
+      }
+
+      .content-wrapper {
+        width: 100%;
+        max-width: 1800px; /* Significantly increased width */
+      }
+
+      .drag-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--mat-sys-surface);
+        opacity: 0.95;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+
+        .drag-content {
+          text-align: center;
+          pointer-events: none;
+
+          mat-icon {
+            font-size: 64px;
+            width: 64px;
+            height: 64px;
+            color: var(--mat-sys-primary);
+            margin-bottom: 1rem;
+          }
+
+          h2 {
+            font-size: 1.5rem;
+            color: var(--mat-sys-primary);
+            margin: 0;
+          }
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
         }
       }
     `,
   ],
 })
 export class App {
-  private oracleService = inject(OracleService);
-  private platformId = inject(PLATFORM_ID);
+  protected readonly chatState = inject(ChatStateService);
+  protected readonly angularVersions = ANGULAR_VERSIONS;
+  protected readonly availableModes = AVAILABLE_MODES;
 
-  // State signals
-  selectedMode = signal<Mode>('question');
-  selectedVersion = signal<string>(this.getInitialVersion());
-  inputText = signal<string>('');
-  isLoading = signal<boolean>(false);
-  response = signal<string>('');
+  isDragging = signal(false);
 
-  // Available Angular versions
-  angularVersions: AngularVersion[] = [
-    { value: '21', label: 'Angular 21 (Latest)' },
-    { value: '20', label: 'Angular 20' },
-    { value: '19', label: 'Angular 19' },
-    { value: '18', label: 'Angular 18' },
-  ];
+  sendMessage() {
+    this.chatState.sendMessage();
+  }
 
-  constructor() {
-    effect(() => {
-      const version = this.selectedVersion();
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-version', version);
+  @HostListener('window:dragover', ['$event'])
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.isDragging()) {
+      this.isDragging.set(true);
+    }
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    // Only hide if we are leaving the overlay (which covers the window)
+    this.isDragging.set(false);
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+
+    if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
+      const file = event.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        this.processFile(file);
       }
-    });
-  }
-
-  private getInitialVersion(): string {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('ng-lens-version') || '21';
     }
-    return '21';
   }
 
-  // Mode configuration
-  modeConfig = computed(() => {
-    const mode = this.selectedMode();
-    switch (mode) {
-      case 'question':
-        return {
-          title: 'Ask a Question',
-          description: 'Get instant answers from Angular documentation',
-          label: 'Your question',
-          placeholder: 'e.g., How do I create a standalone component?',
-          buttonText: 'Ask Question',
-          icon: 'search',
-          ariaLabel: 'Enter your Angular question',
-          submitLabel: 'Submit question',
-          isCode: false,
-          rows: 4,
-          minRows: 4,
-          maxRows: 12,
-        };
-      case 'error':
-        return {
-          title: 'Paste Error',
-          description: 'Get help understanding and fixing Angular errors',
-          label: 'Error message or stack trace',
-          placeholder: 'Paste your error message or stack trace here...',
-          buttonText: 'Analyze Error',
-          icon: 'bug_report',
-          ariaLabel: 'Paste error message or stack trace',
-          submitLabel: 'Analyze error',
-          isCode: true,
-          rows: 8,
-          minRows: 8,
-          maxRows: 20,
-        };
-      case 'review':
-        return {
-          title: 'Code Review',
-          description: 'Get feedback on your Angular code with best practices',
-          label: 'Your Angular code',
-          placeholder:
-            'Paste your Angular component, service, or module code here...',
-          buttonText: 'Review Code',
-          icon: 'rate_review',
-          ariaLabel: 'Paste your Angular code for review',
-          submitLabel: 'Submit code for review',
-          isCode: true,
-          rows: 12,
-          minRows: 12,
-          maxRows: 25,
-        };
-    }
-  });
-
-  handleSubmit(): void {
-    const input = this.inputText().trim();
-    if (!input) return;
-
-    this.isLoading.set(true);
-    this.response.set('');
-
-    this.oracleService
-      .stream({
-        query: input,
-        angularVersion: this.selectedVersion(),
-        mode: this.selectedMode(),
-      })
-      .subscribe({
-        next: (result) => {
-          this.isLoading.set(false);
-          this.response.set(result.response);
-        },
-        error: (error) => {
-          console.error('Error calling Oracle:', error);
-          this.response.set('Sorry, something went wrong. Please try again.');
-          this.isLoading.set(false);
-        },
-        complete: () => {
-          this.isLoading.set(false);
-        },
-      });
-  }
-
-  clearInput(): void {
-    this.inputText.set('');
-    this.response.set('');
+  private processFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.chatState.setImage(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 }

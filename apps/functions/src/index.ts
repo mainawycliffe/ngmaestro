@@ -32,6 +32,35 @@ const oracleInputSchema = z.object({
     .describe('The user query, error message, or code to review'),
   angularVersion: z.string().describe('Angular version (18, 19, 20, or 21)'),
   mode: z.enum(['question', 'error', 'review']).describe('Interaction mode'),
+  image: z.string().optional().describe('Base64 encoded image or data URL'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'model']),
+        content: z.union([z.string(), z.array(z.any())]),
+      })
+    )
+    .optional()
+    .describe('Conversation history'),
+});
+
+const oracleResponseSchema = z.object({
+  blocks: z.array(
+    z.discriminatedUnion('type', [
+      z.object({ type: z.literal('text'), content: z.string() }),
+      z.object({
+        type: z.literal('code'),
+        language: z.string(),
+        content: z.string(),
+        filename: z.string().optional(),
+      }),
+    ])
+  ),
+});
+
+const oracleOutputSchema = z.object({
+  response: oracleResponseSchema,
+  sources: z.array(z.string()).optional(),
 });
 
 // Helper to build mode-specific prompts
@@ -43,42 +72,44 @@ function buildPrompt(
 ) {
   const baseSystem = `You are ng-lens, an AI-powered Angular documentation assistant specialized in Angular ${angularVersion}.
 
-You provide accurate, concise answers strictly based on the official Angular documentation provided in the context below.
-Do not use outside knowledge to answer the question if it is not supported by the context.`;
+Your goal is to guide the user rather than just giving them the answer.
+If the user's request is ambiguous or if you are unsure, ASK A CLARIFYING QUESTION.
+If the information is not present in the provided context, explicitly state "I don't know" or "I cannot answer this based on the documentation provided".
+Do not make up information.
+
+IMPORTANT: You must respond with a JSON object containing a 'blocks' array.
+- Use 'text' blocks for explanations.
+- Use 'code' blocks for code snippets, specifying the language and optional filename.
+`;
 
   const modeInstructions = {
     question: `
 
 When answering questions:
-- Answer directly and concisely
-- Use ONLY information from the provided context
-- Focus on Angular ${angularVersion} best practices
-- Include code examples from the context when relevant
-- If the context doesn't contain the answer, state that the information is not available in the provided documentation.`,
+- Do not just dump the answer. Ask the user questions to help them understand the concept if appropriate.
+- If the question is clear and simple, you can answer, but prefer a guiding approach.
+- Use ONLY information from the provided context.
+- If the context doesn't contain the answer, say "I don't know based on the docs."`,
 
     error: `
 
 When analyzing errors:
-- Use the context to identify the root cause
-- Explain what the error means in simple terms
-- Provide step-by-step solutions based on the context
-- Include relevant code fixes from the documentation
-- If the context lacks information, state that the information is not available in the provided documentation.`,
+- Do not immediately fix the error. Ask the user about their setup or what they tried first.
+- Guide them to the solution using the context.
+- If the context lacks information, say "I don't know based on the docs."`,
 
     review: `
 
 When reviewing code:
-- Compare against Angular ${angularVersion} best practices from the context
-- Check for: standalone components, signals, input()/output(), OnPush
-- Identify accessibility and performance issues
-- Provide specific, actionable feedback
-- Reference relevant documentation sections from the context
-- If the context lacks information, state that the information is not available in the provided documentation.`,
+- Ask questions about why they implemented it that way.
+- Point out potential issues by asking "Have you considered...?"
+- Reference relevant documentation sections from the context.
+- If the context lacks information, say "I don't know based on the docs."`,
   };
 
   const contextSection = context
     ? `\n\nRELEVANT DOCUMENTATION:\n${context}\n`
-    : '\n\nNOTE: No specific documentation context was found. State that you cannot answer based on the provided documentation.\n';
+    : '\n\nNOTE: No specific documentation context was found. You must state that you cannot answer based on the provided documentation.\n';
 
   const userPrompts = {
     question: `${contextSection}\nQUESTION: ${query}`,
@@ -96,16 +127,10 @@ const theOracleFlow = ai.defineFlow(
   {
     name: 'theOracle',
     inputSchema: oracleInputSchema,
-    outputSchema: z.object({
-      response: z.string(),
-      sources: z.array(z.string()).optional(),
-    }),
-    streamSchema: z.object({
-      chunk: z.string(),
-    }),
+    outputSchema: oracleOutputSchema,
   },
-  async (input, { sendChunk }) => {
-    const { query, angularVersion, mode } = input;
+  async (input) => {
+    const { query, angularVersion, mode, history, image } = input;
     const formattedVersion = `v${angularVersion}`;
 
     const relevantDocs = await ai.retrieve({
@@ -130,23 +155,33 @@ const theOracleFlow = ai.defineFlow(
       context
     );
 
-    const response = await ai.generateStream({
+    const messages = (history || []).map((m) => ({
+      role: m.role,
+      content: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }],
+    }));
+
+    const userContent = [{ text: prompt }];
+    if (image) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      userContent.push({ text: '', media: { url: image } } as any);
+    }
+
+    messages.push({
+      role: 'user',
+      content: userContent,
+    });
+
+    const response = await ai.generate({
       system,
-      prompt,
+      messages,
+      output: { schema: oracleResponseSchema },
       config: {
         temperature: 0.3,
       },
     });
 
-    let fullText = '';
-    for await (const chunk of response.stream) {
-      const chunkText = chunk.text;
-      fullText += chunkText;
-      sendChunk({ chunk: chunkText });
-    }
-
     return {
-      response: fullText,
+      response: response.output,
       sources,
     };
   }

@@ -1,20 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
+import { ChatBlock } from '../models/chat.types';
 
 export interface OracleInput {
   query: string;
   angularVersion: string;
   mode: 'question' | 'error' | 'review';
+  image?: string;
+  history?: { role: 'user' | 'model'; content: string | ChatBlock[] }[];
 }
 
 export interface OracleResponse {
-  response: string;
+  response: { blocks: ChatBlock[] };
   sources?: string[];
-}
-
-interface StreamChunk {
-  chunk: string;
 }
 
 @Injectable({
@@ -23,31 +22,11 @@ interface StreamChunk {
 export class OracleService {
   private functions = inject(Functions);
 
-  stream(input: OracleInput): Observable<OracleResponse> {
-    return new Observable<OracleResponse>((observer) => {
-      const theOracle = httpsCallable<OracleInput, OracleResponse>(
-        this.functions,
-        'theOracle'
-      );
-
-      let accumulatedText = '';
-
-      (async () => {
-        try {
-          const { stream, data } = await theOracle.stream(input);
-
-          for await (const chunk of stream as AsyncIterable<StreamChunk>) {
-            accumulatedText += chunk.chunk;
-            observer.next({ response: accumulatedText });
-          }
-
-          const finalResult = await data;
-          observer.next(finalResult);
-          observer.complete();
-        } catch (err) {
-          observer.error(err);
-        }
-      })();
-    });
+  generate(input: OracleInput): Observable<OracleResponse> {
+    const theOracle = httpsCallable<OracleInput, OracleResponse>(
+      this.functions,
+      'theOracle'
+    );
+    return from(theOracle(input).then((r) => r.data));
   }
 }

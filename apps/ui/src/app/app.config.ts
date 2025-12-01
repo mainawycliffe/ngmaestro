@@ -10,6 +10,7 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideMarkdown } from 'ngx-markdown';
 
 const firebaseConfig = {
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
     provideFunctions(() => getFunctions()),
     provideHttpClient(withFetch()),
+    provideAnimationsAsync(),
     provideMarkdown(),
   ],
 };
