@@ -37,10 +37,9 @@ pnpm nx serve ui
 pnpm nx build ui
 ```
 
-
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+Contributions are welcome! **PRs are open and suggestions are highly appreciated.** Please:
 
 1. Fork the repo and create a feature branch
 2. Follow Angular best practices (standalone components, signals, OnPush)
