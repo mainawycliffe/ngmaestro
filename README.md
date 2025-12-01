@@ -1,13 +1,13 @@
-# 🔍 ng-lens
+# 🧙‍♂️ NgOracle
 
 > AI-powered Angular documentation assistant with semantic search and intelligent answers
 
-**ng-lens** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
+**NgOracle** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
 
 ## ✨ Features
 
 - 🤖 **AI-Powered Answers** - Get instant, contextual answers from Angular documentation
-- 📚 **Multi-Version Support** - Query docs for Angular 18, 19, and 20
+- 📚 **Multi-Version Support** - Query docs for Angular 18, 19, 20, and 21
 - 💬 **Three Modes**:
   - **Ask Questions** - Learn Angular concepts quickly
   - **Paste Errors** - Understand and fix error messages
@@ -50,10 +50,10 @@ Contributions are welcome! Please:
 
 ## 🛣️ Roadmap
 
-- [ ] Backend integration (Firebase Genkit + Firestore)
-- [ ] Vector search implementation
-- [ ] Angular docs crawler
-- [ ] Dark mode
+- [x] Backend integration (Firebase Genkit + Firestore)
+- [x] Vector search implementation
+- [x] Angular docs crawler
+- [x] Dark mode
 - [ ] CLI tool
 - [ ] VS Code extension
 
@@ -73,6 +73,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Give a ⭐ if this project helped you!
 
+<a href="https://github.com/sponsors/mainawycliffe" target="_blank">
+  <img src="https://img.shields.io/badge/Sponsor-Maina%20Wycliffe-pink?style=for-the-badge&logo=github-sponsors" alt="Sponsor Maina Wycliffe" />
+</a>
 
 ---
 

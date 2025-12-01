@@ -22,6 +22,7 @@
     "@angular/ssr": "~20.3.0",
     "@genkit-ai/firebase": "^1.24.0",
     "@genkit-ai/google-genai": "^1.24.0",
+    "@genkit-ai/vertexai": "^1.24.0",
     "clipboard": "^2.0.11",
     "express": "^4.21.2",
     "firebase-admin": "^13.0.0",

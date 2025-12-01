@@ -1,11 +1,4 @@
 import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -38,151 +31,129 @@ interface Interaction {
     MatExpansionModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('expandCollapse', [
-      state(
-        'expanded',
-        style({ height: '*', opacity: 1, overflow: 'hidden', display: 'block' })
-      ),
-      state(
-        'collapsed',
-        style({
-          height: '0px',
-          opacity: 0,
-          overflow: 'hidden',
-          display: 'none',
-        })
-      ),
-      transition(
-        'expanded <=> collapsed',
-        animate('300ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-      ),
-    ]),
-  ],
   template: `
     <div class="notebook-stream">
       @for (group of interactions(); track $index) {
       <div class="cell-group">
         <!-- Input Cell (User) -->
         <div class="cell input-cell">
-          <div class="cell-gutter">
-            <span class="execution-count">[{{ $index + 1 }}]</span>
-            <button
-              mat-icon-button
-              class="toggle-button"
-              (click)="toggleSection($index)"
-              [attr.aria-label]="
-                isExpanded($index) ? 'Collapse section' : 'Expand section'
-              "
-            >
-              <mat-icon [class.rotated]="!isExpanded($index)"
-                >expand_more</mat-icon
-              >
-            </button>
-          </div>
           <div class="cell-content">
             <div class="input-source">
+              <div class="source-header">
+                <button
+                  mat-icon-button
+                  class="toggle-button"
+                  (click)="toggleSection($index)"
+                  [attr.aria-label]="
+                    isExpanded($index) ? 'Collapse section' : 'Expand section'
+                  "
+                >
+                  <mat-icon [class.rotated]="!isExpanded($index)"
+                    >expand_more</mat-icon
+                  >
+                </button>
+                <div class="source-code">{{ group.question.content }}</div>
+              </div>
               @if (group.question.image) {
               <div class="image-attachment">
                 <img [src]="group.question.image" alt="User uploaded image" />
               </div>
               }
-              <div class="source-code">{{ group.question.content }}</div>
             </div>
           </div>
         </div>
 
         <!-- Output Cell (Model) -->
-        <div
-          class="cell output-cell"
-          [@expandCollapse]="isExpanded($index) ? 'expanded' : 'collapsed'"
-        >
-          <div class="cell-gutter">
-            <!-- Empty gutter for alignment -->
-          </div>
-          <div class="cell-content">
-            @if (group.answer) {
-            <div class="output-result" aria-live="polite">
-              @if (isString(group.answer.content)) {
-              @if(asString(group.answer.content)) {
-              <markdown
-                [data]="asString(group.answer.content)"
-                clipboard
-              ></markdown>
-              } @else if (isLoading() && $last) {
-              <div class="thinking-skeleton">
-                <div class="skeleton-line short"></div>
-                <div class="skeleton-line medium"></div>
-                <div class="skeleton-line long"></div>
-              </div>
-              } } @else {
-              <div class="blocks-container">
-                @for (block of asBlocks(group.answer.content); track $index) {
-                @if (block.type === 'text') {
-                <div class="text-block">
-                  <markdown [data]="block.content"></markdown>
+        <div class="cell output-cell" [class.expanded]="isExpanded($index)">
+          <div class="cell-wrapper">
+            <div class="cell-gutter">
+              <!-- Empty gutter for alignment -->
+            </div>
+            <div class="cell-content">
+              @if (group.answer) {
+              <div class="output-result" aria-live="polite">
+                @if (isString(group.answer.content)) {
+                @if(asString(group.answer.content)) {
+                <markdown
+                  [data]="asString(group.answer.content)"
+                  clipboard
+                ></markdown>
+                } @else if (isLoading() && $last) {
+                <div class="thinking-skeleton">
+                  <div class="skeleton-line short"></div>
+                  <div class="skeleton-line medium"></div>
+                  <div class="skeleton-line long"></div>
                 </div>
-                } @else if (block.type === 'code') {
-                <div class="code-block-wrapper">
-                  @if (block.filename) {
-                  <div class="code-header">
-                    <span class="filename">
-                      <mat-icon>description</mat-icon>
-                      {{ block.filename }}
-                    </span>
-                    <span class="language-badge">{{ block.language }}</span>
+                } } @else {
+                <div class="blocks-container">
+                  @for (block of asBlocks(group.answer.content); track $index) {
+                  @if (block.type === 'text') {
+                  <div class="text-block">
+                    <markdown [data]="block.content"></markdown>
                   </div>
-                  }
-                  <markdown [data]="getCodeBlock(block)" clipboard></markdown>
+                  } @else if (block.type === 'code') {
+                  <div class="code-block-wrapper">
+                    @if (block.filename) {
+                    <div class="code-header">
+                      <span class="filename">
+                        <mat-icon>description</mat-icon>
+                        {{ block.filename }}
+                      </span>
+                      <span class="language-badge">{{ block.language }}</span>
+                    </div>
+                    }
+                    <markdown [data]="getCodeBlock(block)" clipboard></markdown>
+                  </div>
+                  } }
                 </div>
-                } }
+                } @if (group.answer.sources && group.answer.sources.length > 0)
+                {
+                <div class="sources-section">
+                  <div class="sources-title">Sources:</div>
+                  <ul class="sources-list">
+                    @for (source of group.answer.sources; track $index) {
+                    <li>
+                      <a
+                        [href]="source"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ source }}</a
+                      >
+                    </li>
+                    }
+                  </ul>
+                </div>
+                }
               </div>
-              } @if (group.answer.sources && group.answer.sources.length > 0) {
-              <div class="sources-section">
-                <div class="sources-title">Sources:</div>
-                <ul class="sources-list">
-                  @for (source of group.answer.sources; track $index) {
-                  <li>
-                    <a
-                      [href]="source"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      >{{ source }}</a
-                    >
-                  </li>
-                  }
-                </ul>
+              } @else if (isLoading() && $last) {
+              <div class="thinking-container">
+                <div class="thinking-skeleton">
+                  <div class="skeleton-line short"></div>
+                  <div class="skeleton-line medium"></div>
+                  <div class="skeleton-line long"></div>
+                </div>
+                <div class="thinking-actions">
+                  <span class="thinking-text">Generating response...</span>
+                  <button
+                    mat-button
+                    color="warn"
+                    (click)="cancelRequest.emit()"
+                    class="cancel-button"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
               }
             </div>
-            } @else if (isLoading() && $last) {
-            <div class="thinking-container">
-              <div class="thinking-skeleton">
-                <div class="skeleton-line short"></div>
-                <div class="skeleton-line medium"></div>
-                <div class="skeleton-line long"></div>
-              </div>
-              <div class="thinking-actions">
-                <span class="thinking-text">Generating response...</span>
-                <button
-                  mat-button
-                  color="warn"
-                  (click)="cancelRequest.emit()"
-                  class="cancel-button"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-            }
           </div>
         </div>
       </div>
       } @if (interactions().length === 0) {
       <div class="empty-notebook">
         <div class="notebook-intro">
-          <h1>NgLens</h1>
-          <p>Interactive Angular Learning Environment</p>
+          <h1>NgOracle</h1>
+          <p>AI-powered Angular Documentation Assistant</p>
         </div>
 
         <div class="quick-starts">
@@ -208,7 +179,6 @@ interface Interaction {
       .notebook-stream {
         display: flex;
         flex-direction: column;
-        gap: 2rem;
         padding-bottom: 2rem;
         width: 100%;
       }
@@ -223,7 +193,7 @@ interface Interaction {
         &::before {
           content: '';
           position: absolute;
-          left: 29px; /* Center of gutter */
+          left: 40px; /* Center of gutter */
           top: 2rem;
           bottom: 2rem;
           width: 2px;
@@ -241,24 +211,27 @@ interface Interaction {
       }
 
       .cell-gutter {
-        width: 60px;
+        width: 80px;
         flex-shrink: 0;
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        padding-right: 1rem;
-        padding-top: 1rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.25rem;
+        padding-right: 0.75rem;
+        padding-top: 1.25rem;
         user-select: none;
       }
 
-      .execution-count {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
-        color: var(--mat-sys-secondary);
-        font-weight: 500;
-        background: var(--mat-sys-background); /* Mask line */
-        padding: 2px 0;
-        margin-bottom: 4px;
+      .source-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .source-code {
+        flex: 1;
+        padding-top: 2px;
       }
 
       .toggle-button {
@@ -295,7 +268,7 @@ interface Interaction {
         .cell-content {
           background-color: var(--mat-sys-surface-container-low);
           border-radius: 16px;
-          padding: 1rem 1.5rem;
+          padding: 1rem 2rem;
           transition: background-color 0.2s;
 
           &:hover {
@@ -304,12 +277,14 @@ interface Interaction {
         }
 
         .input-source {
-          font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-            Liberation Mono, monospace;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+            'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+            'Segoe UI Emoji';
           font-size: 14px;
           color: var(--mat-sys-on-surface);
           white-space: pre-wrap;
           line-height: 1.5;
+          font-weight: 700;
         }
 
         .image-attachment {
@@ -324,10 +299,29 @@ interface Interaction {
       }
 
       .output-cell {
-        margin-top: 0.5rem;
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        margin-top: 0;
+        transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+          margin-top 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+
+        &.expanded {
+          grid-template-rows: 1fr;
+          opacity: 1;
+          margin-top: 0.5rem;
+        }
+
+        .cell-wrapper {
+          min-height: 0;
+          display: flex;
+          width: 100%;
+        }
 
         .cell-content {
-          padding: 0.5rem 1.5rem;
+          padding: 0.5rem 2rem;
         }
 
         .output-result {

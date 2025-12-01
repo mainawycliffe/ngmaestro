@@ -39,6 +39,16 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           >
             Report Bug
           </a>
+          <span class="separator">•</span>
+          <a
+            href="https://github.com/sponsors/mainawycliffe"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-link"
+            aria-label="Sponsor on GitHub"
+          >
+            Sponsor
+          </a>
         </div>
       </div>
     </footer>
@@ -52,7 +62,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         margin-top: auto;
 
         .footer-content {
-          max-width: 1400px;
+          max-width: 1800px;
           margin: 0 auto;
           display: flex;
           flex-direction: column;

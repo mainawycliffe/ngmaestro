@@ -120,7 +120,7 @@ interface AngularVersion {
         transition: all 0.3s ease;
 
         .header-content {
-          max-width: 1400px;
+          max-width: 1800px;
           margin: 0 auto;
           display: flex;
           justify-content: space-between;

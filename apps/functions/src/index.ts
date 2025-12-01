@@ -2,11 +2,10 @@ import {
   defineFirestoreRetriever,
   enableFirebaseTelemetry,
 } from '@genkit-ai/firebase';
-import { googleAI } from '@genkit-ai/google-genai';
+import { vertexAI } from '@genkit-ai/vertexai';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { onCallGenkit } from 'firebase-functions/https';
-import { defineSecret } from 'firebase-functions/params';
 import { genkit, z } from 'genkit';
 
 enableFirebaseTelemetry();
@@ -15,11 +14,9 @@ initializeApp();
 const db = getFirestore();
 
 const ai = genkit({
-  plugins: [googleAI()],
-  model: googleAI.model('gemini-2.5-flash'),
+  plugins: [vertexAI({ location: 'us-central1' })],
+  model: vertexAI.model('gemini-2.5-flash'),
 });
-
-const GEMINI_API_KEY = defineSecret('GEMINI_API_KEY');
 
 const angularDocsRetriever = defineFirestoreRetriever(ai, {
   name: 'angularDocsRetriever',
@@ -27,7 +24,7 @@ const angularDocsRetriever = defineFirestoreRetriever(ai, {
   collection: 'angular-docs',
   contentField: 'content',
   vectorField: 'embedding',
-  embedder: googleAI.embedder('text-embedding-004'),
+  embedder: vertexAI.embedder('text-embedding-004'),
   distanceMeasure: 'COSINE',
 });
 
@@ -133,6 +130,17 @@ IMPORTANT: When you have gathered enough information, you must respond with a JS
 - Use 'text' blocks for explanations.
 - Use 'code' blocks for code snippets, specifying the language and optional filename.
 - Use 'sources' array to list the URLs of the documentation pages you used to answer the question.
+
+OUTPUT FORMAT:
+Your response must be a valid JSON object. Do not include any text outside the JSON object.
+Example:
+{
+  "blocks": [
+    { "type": "text", "content": "Here is the answer..." },
+    { "type": "code", "language": "typescript", "content": "const x = 1;" }
+  ],
+  "sources": ["https://angular.dev/guide/signals"]
+}
 `;
 
   const modeInstructions = {
@@ -220,9 +228,4 @@ const theOracleFlow = ai.defineFlow(
   }
 );
 
-export const theOracle = onCallGenkit(
-  {
-    secrets: [GEMINI_API_KEY],
-  },
-  theOracleFlow
-);
+export const theOracle = onCallGenkit(theOracleFlow);
