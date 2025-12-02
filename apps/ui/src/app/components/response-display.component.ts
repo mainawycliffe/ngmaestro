@@ -226,6 +226,10 @@ interface Interaction {
           background: var(--mat-sys-outline-variant);
           opacity: 0.3;
           z-index: 0;
+
+          @media (max-width: 768px) {
+            display: none;
+          }
         }
       }
 
@@ -247,6 +251,10 @@ interface Interaction {
         padding-right: 0.75rem;
         padding-top: 1.25rem;
         user-select: none;
+
+        @media (max-width: 768px) {
+          display: none;
+        }
       }
 
       .source-header {
@@ -296,6 +304,10 @@ interface Interaction {
           border-radius: 16px;
           padding: 1rem 2rem;
           transition: background-color 0.2s;
+
+          @media (max-width: 768px) {
+            padding: 1rem;
+          }
 
           &:hover {
             background-color: var(--mat-sys-surface-container);
@@ -349,6 +361,10 @@ interface Interaction {
 
         .cell-content {
           padding: 0.5rem 2rem;
+
+          @media (max-width: 768px) {
+            padding: 0.5rem 1rem;
+          }
         }
 
         .output-result {

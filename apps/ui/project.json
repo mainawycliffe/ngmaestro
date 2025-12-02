@@ -8,7 +8,9 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/ui",
         "browser": "apps/ui/src/main.ts",
@@ -21,7 +23,9 @@
             "input": "apps/ui/public"
           }
         ],
-        "styles": ["apps/ui/src/styles.scss"],
+        "styles": [
+          "apps/ui/src/styles.scss"
+        ],
         "server": "apps/ui/src/main.server.ts",
         "ssr": {
           "entry": "apps/ui/src/server.ts"
@@ -38,8 +42,8 @@
             },
             {
               "type": "anyComponentStyle",
-              "maximumWarning": "4kb",
-              "maximumError": "8kb"
+              "maximumWarning": "6kb",
+              "maximumError": "12kb"
             }
           ],
           "outputHashing": "all"
@@ -76,7 +80,9 @@
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["{options.reportsDirectory}"],
+      "outputs": [
+        "{options.reportsDirectory}"
+      ],
       "options": {
         "reportsDirectory": "../../coverage/apps/ui"
       }

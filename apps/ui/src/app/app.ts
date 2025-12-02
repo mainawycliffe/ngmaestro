@@ -142,7 +142,7 @@ import { ChatStateService } from './services/chat-state.service';
       .notebook-container {
         flex: 1;
         /* overflow-y: auto; Removed internal scroll */
-        padding: 1rem;
+        padding: 0.5rem;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -164,7 +164,7 @@ import { ChatStateService } from './services/chat-state.service';
         width: 100%;
         background: var(--mat-sys-background);
         border-top: 1px solid var(--mat-sys-outline-variant);
-        padding: 1rem;
+        padding: 0.5rem;
         z-index: 10;
         animation: fadeIn 0.3s ease-out;
         display: flex;

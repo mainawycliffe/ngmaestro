@@ -168,6 +168,10 @@ import { Mode, ModeOption } from '../models/chat.types';
           sans-serif;
         position: relative;
         margin-top: 1rem;
+
+        @media (max-width: 768px) {
+          margin-top: 0.5rem;
+        }
       }
 
       .cell-gutter {
@@ -178,6 +182,10 @@ import { Mode, ModeOption } from '../models/chat.types';
         display: flex;
         justify-content: flex-end;
         color: var(--mat-sys-outline);
+
+        @media (max-width: 768px) {
+          display: none;
+        }
       }
 
       .cell-content-wrapper {
@@ -206,6 +214,10 @@ import { Mode, ModeOption } from '../models/chat.types';
         padding: 0.5rem 1rem;
         border-bottom: 1px solid var(--mat-sys-outline-variant);
         background: var(--mat-sys-surface-container-low);
+
+        @media (max-width: 768px) {
+          padding: 0.5rem;
+        }
       }
 
       .mode-selector {
@@ -218,6 +230,10 @@ import { Mode, ModeOption } from '../models/chat.types';
           font-weight: 600;
           color: var(--mat-sys-on-surface);
           letter-spacing: 0.25px;
+
+          @media (max-width: 768px) {
+            display: none;
+          }
         }
       }
 
@@ -283,6 +299,10 @@ import { Mode, ModeOption } from '../models/chat.types';
           margin-right: 0.5rem;
           color: var(--mat-sys-on-surface-variant);
           font-weight: 500;
+
+          @media (max-width: 768px) {
+            display: none;
+          }
         }
       }
 
@@ -390,6 +410,10 @@ import { Mode, ModeOption } from '../models/chat.types';
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
             font-weight: 500;
+          }
+
+          @media (max-width: 768px) {
+            display: none;
           }
         }
 
