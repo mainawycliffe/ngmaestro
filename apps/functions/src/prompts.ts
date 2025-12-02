@@ -96,14 +96,24 @@ ACCURACY MODE:
 IMPORTANT: When you have gathered enough information, you must respond with a JSON object containing a 'blocks' array.
 - Use 'text' blocks for explanations. You MUST use Markdown for formatting (bold key terms, use lists for readability).
 - Use 'code' blocks for code snippets, specifying the language and optional filename.
+`;
 
+  const outputFormatInstructions = `
 OUTPUT FORMAT:
-Your response must be a valid JSON object. Do not include any text outside the JSON object.
+Your response must be a valid JSON object matching the schema.
+The 'blocks' array must contain objects that are EITHER a text block OR a code block.
+
+Text Block:
+{ "type": "text", "content": "..." }
+
+Code Block:
+{ "type": "code", "language": "...", "content": "...", "filename": "..." }
+
 Example:
 {
   "blocks": [
     { "type": "text", "content": "Here is the answer..." },
-    { "type": "code", "language": "typescript", "content": "const x = 1;" }
+    { "type": "code", "language": "typescript", "content": "const x = 1;", "filename": "example.ts" }
   ]
 }
 `;
@@ -161,7 +171,7 @@ ${
   };
 
   return {
-    system: baseSystem + modeInstructions[mode],
+    system: baseSystem + modeInstructions[mode] + outputFormatInstructions,
     prompt: userPrompts[mode],
   };
 }

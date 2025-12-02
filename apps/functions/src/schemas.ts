@@ -16,7 +16,7 @@ export const oracleInputSchema = z.object({
       z.object({
         role: z.enum(['user', 'model', 'tool']),
         content: z.union([z.string(), z.array(z.any())]),
-      })
+      }),
     )
     .optional()
     .describe('Conversation history'),
@@ -32,7 +32,7 @@ export const oracleResponseSchema = z.object({
         content: z.string(),
         filename: z.string().optional(),
       }),
-    ])
+    ]),
   ),
 });
 
