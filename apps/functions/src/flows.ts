@@ -23,8 +23,11 @@ export const theOracleFlow = ai.defineFlow(
       learningMode,
     );
 
-    const messages = (history || []).map((m) => ({
-      role: m.role,
+    const messages: Array<{
+      role: 'user' | 'model' | 'tool' | 'system';
+      content: Array<{ text: string } | { media: { url: string } }>;
+    }> = (history || []).map((m) => ({
+      role: m.role as 'user' | 'model' | 'tool',
       content: [
         {
           text:
@@ -35,10 +38,11 @@ export const theOracleFlow = ai.defineFlow(
       ],
     }));
 
-    const userContent = [{ text: prompt }];
+    const userContent: Array<{ text: string } | { media: { url: string } }> = [
+      { text: prompt },
+    ];
     if (image) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      userContent.push({ text: '', media: { url: image } } as any);
+      userContent.push({ media: { url: image } });
     }
 
     messages.push({
