@@ -18,6 +18,7 @@ export class ChatStateService {
   private oracleService = inject(OracleService);
   private platformId = inject(PLATFORM_ID);
   private currentSubscription: Subscription | null = null;
+  private lastRequestPayload: OracleInput | null = null;
 
   // State
   readonly selectedMode = signal<Mode>(this.getInitialMode());
@@ -111,7 +112,7 @@ export class ChatStateService {
         localStorage.setItem('ng-lens-font-size', size.toString());
         document.documentElement.style.setProperty(
           '--app-font-size',
-          `${size}px`
+          `${size}px`,
         );
       }
     });
@@ -247,6 +248,64 @@ export class ChatStateService {
     });
   }
 
+  retryLastRequest() {
+    if (!this.lastRequestPayload) return;
+
+    // Cancel any pending request
+    if (this.currentSubscription) {
+      this.currentSubscription.unsubscribe();
+    }
+
+    // Update the last model message to show loading state
+    this.messages.update((msgs) => {
+      const newMsgs = [...msgs];
+      const lastIdx = newMsgs.length - 1;
+      if (newMsgs[lastIdx] && newMsgs[lastIdx].role === 'model') {
+        newMsgs[lastIdx] = {
+          ...newMsgs[lastIdx],
+          content: '',
+        };
+      }
+      return newMsgs;
+    });
+
+    this.isLoading.set(true);
+
+    this.currentSubscription = this.oracleService
+      .generate(this.lastRequestPayload)
+      .subscribe({
+        next: (result) => {
+          this.messages.update((msgs) => {
+            const newMsgs = [...msgs];
+            const lastIdx = newMsgs.length - 1;
+            newMsgs[lastIdx] = {
+              ...newMsgs[lastIdx],
+              content: result.response.blocks,
+            };
+            return newMsgs;
+          });
+        },
+        error: (error) => {
+          console.error('Error calling Oracle:', error);
+          this.messages.update((msgs) => {
+            const newMsgs = [...msgs];
+            const lastIdx = newMsgs.length - 1;
+            newMsgs[lastIdx] = {
+              ...newMsgs[lastIdx],
+              content: 'Sorry, something went wrong. Please try again.',
+            };
+            return newMsgs;
+          });
+          this.isLoading.set(false);
+          this.currentSubscription = null;
+        },
+        complete: () => {
+          this.isLoading.set(false);
+          this.currentSubscription = null;
+        },
+      });
+  }
+
   sendMessage() {
     const input = this.inputText().trim();
     const image = this.selectedImage();
@@ -289,6 +348,9 @@ export class ChatStateService {
     if (image) {
       payload.image = image;
     }
+
+    // Store payload for retry
+    this.lastRequestPayload = payload;
 
     this.currentSubscription = this.oracleService.generate(payload).subscribe({
       next: (result) => {

@@ -78,10 +78,31 @@ interface Interaction {
                   <div class="output-result" aria-live="polite">
                     @if (isString(group.answer.content)) {
                       @if (asString(group.answer.content)) {
-                        <markdown
-                          [data]="asString(group.answer.content)"
-                          clipboard
-                        ></markdown>
+                        @if (
+                          asString(group.answer.content) ===
+                          'Sorry, something went wrong. Please try again.'
+                        ) {
+                          <div class="error-state">
+                            <markdown
+                              [data]="asString(group.answer.content)"
+                              clipboard
+                            ></markdown>
+                            <button
+                              mat-flat-button
+                              color="primary"
+                              (click)="retryRequest.emit()"
+                              class="retry-button"
+                            >
+                              <mat-icon>refresh</mat-icon>
+                              Retry
+                            </button>
+                          </div>
+                        } @else {
+                          <markdown
+                            [data]="asString(group.answer.content)"
+                            clipboard
+                          ></markdown>
+                        }
                       } @else if (isLoading() && $last) {
                         <div class="thinking-skeleton">
                           <div class="skeleton-line short"></div>
@@ -338,10 +359,37 @@ interface Interaction {
           line-height: 1.6;
           color: var(--mat-sys-on-surface);
 
+          .error-state {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+
+            markdown {
+              color: var(--mat-sys-error);
+            }
+
+            .retry-button {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              border-radius: 6px;
+              padding: 0 1.5rem;
+              height: 36px;
+              font-weight: 600;
+
+              mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+              }
+            }
+          }
+
           .blocks-container {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 0.5rem;
           }
 
           .text-block {
@@ -635,6 +683,7 @@ export class ResponseDisplayComponent {
   messages = input.required<ChatMessage[]>();
   isLoading = input.required<boolean>();
   cancelRequest = output<void>();
+  retryRequest = output<void>();
   promptSelected = output<string>();
 
   protected readonly examplePrompts = EXAMPLE_PROMPTS;

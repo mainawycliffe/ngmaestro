@@ -57,6 +57,7 @@ import { ChatStateService } from './services/chat-state.service';
               [isLoading]="chatState.isLoading()"
               [messages]="chatState.messages()"
               (cancelRequest)="chatState.cancelRequest()"
+              (retryRequest)="chatState.retryLastRequest()"
               (promptSelected)="chatState.setInputText($event)"
             />
           </div>
