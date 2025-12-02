@@ -1,4 +1,4 @@
-import { googleAI } from '@genkit-ai/google-genai';
+import { vertexAI } from '@genkit-ai/vertexai';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { readFileSync, readdirSync, statSync } from 'fs';
@@ -13,46 +13,91 @@ initializeApp({
 
 const db = getFirestore();
 
-// Initialize Genkit
+// Vertex AI configuration
+const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'ng-lens';
+const location = process.env.VERTEX_AI_LOCATION || 'us-central1';
+
+// Initialize Genkit with Vertex AI
 const ai = genkit({
-  plugins: [googleAI()],
+  plugins: [vertexAI({ projectId, location })],
 });
 
-const embedder = googleAI.embedder('text-embedding-004');
+// Use Vertex AI embedder
+const embedder = vertexAI.embedder('text-embedding-004');
+
+console.log('Using Vertex AI for embeddings');
+console.log(`Project: ${projectId}, Location: ${location}`);
+
+// Rate limiting helper
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Documentation source types
+type DocSource = 'angular' | 'material' | 'ngrx';
+
+// Map source to collection name
+const getCollectionName = (source: DocSource): string => {
+  switch (source) {
+    case 'angular':
+      return 'angular-docs';
+    case 'material':
+      return 'material-docs';
+    case 'ngrx':
+      return 'ngrx-docs';
+  }
+};
 
 // Define the indexer
-const angularDocsIndexer = ai.defineIndexer(
+const docsIndexer = ai.defineIndexer(
   {
-    name: 'angularDocsIndexer',
+    name: 'docsIndexer',
   },
   async (docs) => {
     const batch = db.batch();
     let batchCount = 0;
 
-    // Generate embeddings for all docs in this batch
-    const embeddings = await Promise.all(
-      docs.map((d) => ai.embed({ embedder, content: d.text }))
-    );
+    // Process embeddings in smaller batches to avoid rate limits
+    const EMBEDDING_BATCH_SIZE = 5;
+    const embeddings = [];
+
+    for (let i = 0; i < docs.length; i += EMBEDDING_BATCH_SIZE) {
+      const batchDocs = docs.slice(i, i + EMBEDDING_BATCH_SIZE);
+      const batchEmbeddings = await Promise.all(
+        batchDocs.map((d) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ai.embed({ embedder: embedder as any, content: d.text }),
+        ),
+      );
+      embeddings.push(...batchEmbeddings);
+
+      // Add delay between batches to respect rate limits
+      if (i + EMBEDDING_BATCH_SIZE < docs.length) {
+        await sleep(1000); // 1 second delay between batches
+      }
+    }
 
     for (let i = 0; i < docs.length; i++) {
       const doc = docs[i];
-      const { version, path, section, url, tokens } = doc.metadata || {};
+      const { source, version, path, section, url, tokens } =
+        doc.metadata || {};
 
       // Handle potential array response or single object
       const result = embeddings[i];
       const embedding = Array.isArray(result)
         ? result[0].embedding
-        : (result as any).embedding;
+        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (result as any).embedding;
 
       // Create a deterministic ID
       const docId =
         doc.metadata?.id ||
-        `${version}_${path.replace(/[/.]/g, '-')}_${Date.now()}`;
+        `${source}_${version}_${path.replace(/[/.]/g, '-')}_${Date.now()}`;
 
-      const docRef = db.collection('angular-docs').doc(docId);
+      const collectionName = getCollectionName(source as DocSource);
+      const docRef = db.collection(collectionName).doc(docId);
 
       batch.set(docRef, {
         id: docId,
+        source,
         version,
         path,
         content: doc.text,
@@ -77,7 +122,7 @@ const angularDocsIndexer = ai.defineIndexer(
       await batch.commit();
       console.log(`    Committed final batch of ${batchCount} chunks`);
     }
-  }
+  },
 );
 
 // Parse markdown frontmatter and content
@@ -145,18 +190,37 @@ function getMarkdownFiles(versionDir: string): string[] {
   return files;
 }
 
-// Process a single version's documentation
-async function processVersion(version: string, docsPath: string) {
-  console.log(`\nProcessing Angular ${version}...`);
+// Generate URL based on source and path
+function generateUrl(source: DocSource, relativePath: string): string {
+  const pathWithoutExt = relativePath.replace('.md', '');
 
-  const versionDir = join(docsPath, version);
+  switch (source) {
+    case 'angular':
+      return `https://angular.dev/${pathWithoutExt}`;
+    case 'material':
+      return `https://material.angular.io/${pathWithoutExt}`;
+    case 'ngrx':
+      return `https://ngrx.io/guide/${pathWithoutExt}`;
+    default:
+      return '';
+  }
+}
+
+// Process a single version's documentation
+async function processVersion(
+  source: DocSource,
+  version: string,
+  versionDir: string,
+) {
+  const sourceLabel = source.charAt(0).toUpperCase() + source.slice(1);
+  console.log(`\nProcessing ${sourceLabel} ${version}...`);
 
   // Check if directory exists
   try {
     statSync(versionDir);
   } catch {
     console.warn(
-      `Directory for ${version} not found at ${versionDir}. Skipping.`
+      `Directory for ${sourceLabel} ${version} not found at ${versionDir}. Skipping.`,
     );
     return;
   }
@@ -181,30 +245,31 @@ async function processVersion(version: string, docsPath: string) {
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         const sanitizedPath = relativePath.replace(/[/.]/g, '-');
-        const docId = `${version}_${sanitizedPath}_${i}`;
+        const docId = `${source}_${version}_${sanitizedPath}_${i}`;
 
         documents.push(
           new Document({
             content: [{ text: chunk }],
             metadata: {
               id: docId,
+              source,
               version,
               path: relativePath,
               title,
               section,
-              url: `https://angular.dev/${relativePath.replace('.md', '')}`,
+              url: generateUrl(source, relativePath),
               tokens: Math.ceil(chunk.length / 4),
             },
-          })
+          }),
         );
       }
 
       processedCount++;
 
-      // Index in batches of 50 documents to avoid memory issues and show progress
-      if (documents.length >= 50) {
+      // Index in batches of 10 documents to avoid rate limits and show progress
+      if (documents.length >= 10) {
         await ai.index({
-          indexer: angularDocsIndexer,
+          indexer: docsIndexer,
           documents: [...documents], // Pass a copy
         });
         documents.length = 0; // Clear array
@@ -217,13 +282,13 @@ async function processVersion(version: string, docsPath: string) {
   // Index remaining documents
   if (documents.length > 0) {
     await ai.index({
-      indexer: angularDocsIndexer,
+      indexer: docsIndexer,
       documents,
     });
   }
 
   console.log(
-    `✓ Completed Angular ${version}: ${processedCount} files processed`
+    `✓ Completed ${sourceLabel} ${version}: ${processedCount} files processed`,
   );
 }
 
@@ -232,14 +297,37 @@ async function main() {
   const docsPath = join(process.cwd(), 'docs');
   const versions = ['v18', 'v19', 'v20', 'v21'];
 
-  console.log('Starting Angular documentation processing...');
+  console.log('Starting documentation processing...');
   console.log('Docs path:', docsPath);
+  console.log('================================================\n');
 
+  // Process Angular core documentation
+  console.log('Processing Angular Core Documentation');
+  console.log('---------------------------------------');
   for (const version of versions) {
-    await processVersion(version, docsPath);
+    const versionDir = join(docsPath, version);
+    await processVersion('angular', version, versionDir);
   }
 
-  console.log('\n✓ All versions processed successfully!');
+  // Process Angular Material documentation
+  console.log('\n\nProcessing Angular Material Documentation');
+  console.log('------------------------------------------');
+  for (const version of versions) {
+    const versionDir = join(docsPath, 'material', version);
+    await processVersion('material', version, versionDir);
+  }
+
+  // Process NgRx documentation
+  console.log('\n\nProcessing NgRx Documentation');
+  console.log('------------------------------');
+  for (const version of versions) {
+    const versionDir = join(docsPath, 'ngrx', version);
+    await processVersion('ngrx', version, versionDir);
+  }
+
+  console.log('\n================================================');
+  console.log('✓ All documentation processed successfully!');
+  console.log('================================================');
 }
 
 // Run the script
