@@ -388,9 +388,9 @@ export class ChatStateService {
   // Helpers
   private getInitialVersion(): string {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('ng-lens-version') || '21';
+      return localStorage.getItem('ng-lens-version') || 'auto';
     }
-    return '21';
+    return 'auto';
   }
 
   private getInitialMode(): Mode {

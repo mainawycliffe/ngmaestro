@@ -81,6 +81,7 @@ import { ChatStateService } from './services/chat-state.service';
               [inputText]="chatState.inputText()"
               [modes]="availableModes"
               [selectedMode]="chatState.selectedMode()"
+              [selectedVersion]="chatState.selectedVersion()"
               [isCompact]="chatState.messages().length > 0"
               [selectedImage]="chatState.selectedImage()"
               [isLearnMode]="chatState.isLearnMode()"

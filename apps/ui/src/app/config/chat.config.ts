@@ -1,6 +1,7 @@
 import { AngularVersion, ModeOption } from '../models/chat.types';
 
 export const ANGULAR_VERSIONS: AngularVersion[] = [
+  { value: 'auto', label: 'Auto' },
   { value: '21', label: 'Angular 21 (Latest)' },
   { value: '20', label: 'Angular 20' },
   { value: '19', label: 'Angular 19' },

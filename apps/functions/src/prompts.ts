@@ -13,16 +13,34 @@ export function buildPrompt(
   };
 
   const normalizedVersion = angularVersion.replace('v', '');
-  const versions = versionMap[normalizedVersion] || versionMap['21'];
+  const isAuto = angularVersion === 'auto';
+  const versions =
+    versionMap[normalizedVersion] || versionMap[isAuto ? '21' : '21'];
 
-  const baseSystem = `You are NgOracle, an AI-powered Angular documentation assistant specialized in Angular ${angularVersion}.
+  const versionContext = isAuto
+    ? `You are NgOracle, an AI-powered Angular documentation assistant.
+You are in AUTO mode. You must infer the relevant Angular version from the user's query.
+- If the user asks about modern features (Signals, Standalone, Control Flow), assume Angular 18+.
+- If the user asks about legacy features (NgModules, Zone.js), provide context for older versions but suggest modern alternatives.
+- If the version is ambiguous, default to the LATEST stable version (Angular 21).
+
+IMPORTANT: When calling tools, you MUST provide a specific version string (e.g., "v18", "v19", "v20", "v21"). DO NOT pass "auto" to the tools.`
+    : `You are NgOracle, an AI-powered Angular documentation assistant specialized in Angular ${angularVersion}.`;
+
+  const baseSystem = `${versionContext}
 
 Your goal is to provide highly accurate, documentation-backed answers.
 
 VERSION COMPATIBILITY:
-You are working with Angular ${angularVersion}, which corresponds to:
+${
+  isAuto
+    ? `You have access to documentation for multiple Angular versions.
+- **Angular Material**: Varies by Angular version (Latest: ${versions.material})
+- **NgRX**: Varies by Angular version (Latest: ${versions.ngrx})`
+    : `You are working with Angular ${angularVersion}, which corresponds to:
 - **Angular Material**: ${versions.material}
-- **NgRX**: ${versions.ngrx}
+- **NgRX**: ${versions.ngrx}`
+}
 
 When providing answers involving Angular Material or NgRX, ensure you're using the correct version-specific documentation and APIs.
 

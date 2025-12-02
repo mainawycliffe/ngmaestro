@@ -20,6 +20,8 @@ export const searchAngularDocs = ai.defineTool(
         z.object({
           content: z.string(),
           url: z.string().optional(),
+          version: z.string().optional(),
+          title: z.string().optional(),
         }),
       ),
     }),

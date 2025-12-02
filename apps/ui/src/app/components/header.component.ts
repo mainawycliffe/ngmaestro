@@ -43,20 +43,29 @@ interface AngularVersion {
         </div>
 
         <div class="header-actions">
-          <mat-form-field appearance="outline" class="version-selector">
-            <mat-label>Angular Version</mat-label>
-            <mat-select
-              [value]="selectedVersion()"
-              (valueChange)="versionChange.emit($event)"
-              aria-label="Select Angular version"
-            >
-              @for (version of versions(); track version.value) {
-                <mat-option [value]="version.value">
-                  {{ version.label }}
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+          <div class="version-selector-wrapper">
+            <mat-form-field appearance="outline" class="version-selector">
+              <mat-label>Angular Version</mat-label>
+              <mat-select
+                [value]="selectedVersion()"
+                (valueChange)="versionChange.emit($event)"
+                aria-label="Select Angular version"
+              >
+                @for (version of versions(); track version.value) {
+                  <mat-option [value]="version.value">
+                    {{ version.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            @if (selectedVersion() === 'auto') {
+              <mat-icon
+                class="info-icon"
+                matTooltip="Select a specific version for more precise results"
+                >info</mat-icon
+              >
+            }
+          </div>
 
           <div class="divider"></div>
 
@@ -190,13 +199,32 @@ interface AngularVersion {
           gap: 0.5rem;
         }
 
-        .version-selector {
-          min-width: 160px;
-          margin: 0;
+        .version-selector-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
 
-          /* Compact form field */
-          ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-            display: none;
+          .version-selector {
+            min-width: 160px;
+            margin: 0;
+
+            /* Compact form field */
+            ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+              display: none;
+            }
+          }
+
+          .info-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: var(--mat-sys-secondary);
+            cursor: help;
+            opacity: 0.7;
+
+            &:hover {
+              opacity: 1;
+            }
           }
         }
 

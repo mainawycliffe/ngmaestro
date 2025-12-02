@@ -80,6 +80,16 @@ import { Mode, ModeOption } from '../models/chat.types';
 
         <!-- Input Area -->
         <div class="input-editor" [class.code-mode]="isCode()">
+          @if (selectedVersion() === 'auto') {
+            <div class="version-hint">
+              <mat-icon>info</mat-icon>
+              <span
+                >Select a specific Angular version for more accurate
+                results</span
+              >
+            </div>
+          }
+
           @if (selectedImage()) {
             <div class="image-preview-container">
               <img
@@ -316,6 +326,26 @@ import { Mode, ModeOption } from '../models/chat.types';
           background: var(--mat-sys-surface-container-lowest);
         }
 
+        .version-hint {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          margin-bottom: 0.5rem;
+          background-color: var(--mat-sys-surface-container-high);
+          border-radius: 8px;
+          font-size: 0.8rem;
+          color: var(--mat-sys-on-surface-variant);
+          border: 1px solid var(--mat-sys-outline-variant);
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            color: var(--mat-sys-primary);
+          }
+        }
+
         textarea {
           width: 100%;
           border: none;
@@ -470,6 +500,9 @@ export class ModeInputComponent {
   modes = input<ModeOption[]>([]);
   selectedMode = input.required<Mode>();
   modeChange = output<Mode>();
+
+  // Version selection
+  selectedVersion = input<string>('auto');
 
   // Learn Mode
   isLearnMode = input<boolean>(true);

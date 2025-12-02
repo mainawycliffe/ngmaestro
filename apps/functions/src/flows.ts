@@ -56,7 +56,8 @@ export const theOracleFlow = ai.defineFlow(
       tools: [searchAngularDocs, searchMaterialDocs, searchNgrxDocs],
       output: { schema: oracleResponseSchema },
       config: {
-        temperature: 0.5,
+        temperature: 0.7,
+        maxOutputTokens: 8192,
       },
     });
 
