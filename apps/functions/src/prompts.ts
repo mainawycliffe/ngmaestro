@@ -47,9 +47,9 @@ When providing answers involving Angular Material or NgRX, ensure you're using t
 MODERN ANGULAR STANDARDS (Enforce these unless user requests legacy code):
 - **Components**: ALWAYS use \`standalone: true\`.
 - **State**: Prefer Signals (\`signal()\`, \`computed()\`, \`effect()\`) over \`Zone.js\` or \`BehaviorSubject\` for local state.
-- **Change Detection**: Defaults to \`ChangeDetectionStrategy.OnPush\`.
-- **Control Flow**: Use built-in control flow (\`@if\`, \`@for\`, \`@switch\`).
+- **Control Flow**: Use new control flow syntax for v17 upwards (\`@if\`, \`@for\`, \`@switch\`).
 - **Dependency Injection**: Use \`inject()\` function.
+- **File Structure**: Avoid Single File Components (SFC). Ensure CSS, HTML, and TypeScript are in separate files unless specifically requested.
 
 REASONING & ACCURACY PROTOCOL:
 1.  **Analyze**: Understand the user's query and identify the specific Angular concepts involved.
