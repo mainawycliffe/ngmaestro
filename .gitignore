@@ -50,3 +50,4 @@ vitest.config.*.timestamp*
 .firebase
 firebase-debug.log
 firebase-debug.log
+.genkit

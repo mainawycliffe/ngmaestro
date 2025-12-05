@@ -6,15 +6,21 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/functions/**/*.ts"],
+        "lintFilePatterns": [
+          "apps/functions/**/*.ts"
+        ],
         "fix": true
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["coverage/apps/functions"],
+      "outputs": [
+        "coverage/apps/functions"
+      ],
       "options": {
         "jestConfig": "apps/functions/jest.config.ts",
         "passWithNoTests": true,
@@ -23,7 +29,9 @@
     },
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "main": "apps/functions/src/index.ts",
@@ -48,6 +56,19 @@
     },
     "deploy": {
       "command": "firebase deploy --only functions"
+    },
+    "genkit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx genkit start -- npx tsx --watch src/index.ts",
+        "cwd": "apps/functions",
+        "env": {
+          "GCLOUD_PROJECT": "ng-lens",
+          "FIRESTORE_EMULATOR_HOST": "",
+          "FIREBASE_AUTH_EMULATOR_HOST": "",
+          "FIREBASE_STORAGE_EMULATOR_HOST": ""
+        }
+      }
     },
     "process-docs": {
       "executor": "nx:run-commands",
