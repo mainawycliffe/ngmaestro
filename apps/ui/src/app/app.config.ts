@@ -5,13 +5,16 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter } from '@angular/router';
 import { provideMarkdown } from 'ngx-markdown';
+import { appRoutes } from './app.routes';
 
 const firebaseConfig = {
   projectId: 'ng-lens',
@@ -24,10 +27,12 @@ const firebaseConfig = {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideRouter(appRoutes),
     provideClientHydration(withEventReplay()),
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideFirestore(() => getFirestore()),
     provideFunctions(() => getFunctions()),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),

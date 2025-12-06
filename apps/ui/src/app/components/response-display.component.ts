@@ -15,6 +15,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MarkdownComponent } from 'ngx-markdown';
 import { EXAMPLE_PROMPTS } from '../config/examples.config';
 import { ChatBlock, ChatMessage, CodeBlock } from '../models/chat.types';
+import { BugReportComponent } from './bug-report.component';
+import { ShareResultComponent } from './share-result.component';
 
 interface Interaction {
   question: ChatMessage;
@@ -30,6 +32,8 @@ interface Interaction {
     MatButtonModule,
     MatIconModule,
     MatExpansionModule,
+    ShareResultComponent,
+    BugReportComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -143,6 +147,25 @@ interface Interaction {
                       </div>
                     }
                   </div>
+
+                  <!-- Action Buttons -->
+                  @if (group.answer && !isString(group.answer.content)) {
+                    <div class="action-buttons">
+                      <app-share-result
+                        [query]="asString(group.question.content)"
+                        [angularVersion]="selectedVersion()"
+                        [mode]="selectedMode()"
+                        [response]="{ blocks: asBlocks(group.answer.content) }"
+                        [learningMode]="isLearnMode()"
+                      />
+                      <app-bug-report
+                        [query]="asString(group.question.content)"
+                        [angularVersion]="selectedVersion()"
+                        [mode]="selectedMode()"
+                        [response]="{ blocks: asBlocks(group.answer.content) }"
+                      />
+                    </div>
+                  }
                 } @else if (isLoading() && $last) {
                   <div class="thinking-container">
                     <div class="thinking-skeleton">
@@ -692,12 +715,24 @@ interface Interaction {
           }
         }
       }
+
+      .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--mat-sys-outline-variant);
+      }
     `,
   ],
 })
 export class ResponseDisplayComponent {
   messages = input.required<ChatMessage[]>();
   isLoading = input.required<boolean>();
+  selectedVersion = input.required<string>();
+  selectedMode = input.required<'question' | 'error' | 'review'>();
+  isLearnMode = input.required<boolean>();
   cancelRequest = output<void>();
   retryRequest = output<void>();
   promptSelected = output<string>();
