@@ -163,7 +163,7 @@ import { ChatStateService } from '../services/chat-state.service';
     }
 
     .content-wrapper {
-      max-width: 1400px;
+      max-width: 1800px;
       margin: 0 auto;
       padding: 2rem;
       width: 100%;

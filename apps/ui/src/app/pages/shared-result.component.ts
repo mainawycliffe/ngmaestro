@@ -116,9 +116,9 @@ import {
   `,
   styles: `
     .shared-result-container {
-      max-width: 900px;
+      max-width: 1800px;
       margin: 2rem auto;
-      padding: 1rem;
+      padding: 0 2rem;
     }
 
     .loading-state {
