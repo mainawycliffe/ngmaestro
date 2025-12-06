@@ -2,7 +2,7 @@ export function buildPrompt(
   mode: 'question' | 'error' | 'review',
   query: string,
   angularVersion: string,
-  learningMode = false,
+  learningMode = true,
 ) {
   // Map Angular version to Material and NgRX versions
   const versionMap: Record<string, { material: string; ngrx: string }> = {
@@ -52,25 +52,38 @@ MODERN ANGULAR STANDARDS (Enforce these unless user requests legacy code):
 - **File Structure**: Avoid Single File Components (SFC). Ensure CSS, HTML, and TypeScript are in separate files unless specifically requested.
 
 REASONING & ACCURACY PROTOCOL:
-1.  **Analyze**: Break down the user's query into smaller, distinct concepts or steps. Identify the specific Angular terms and features associated with each part.
-2.  **Search**: Use the appropriate documentation tools to search for each identified concept or step:
-    - 'searchAngularDocs' for Angular core features
-    - 'searchMaterialDocs' for Angular Material components, theming, CDK, and accessibility
-    - 'searchNgrxDocs' for state management, Store, Effects, Entity, Router Store, or Signal Store
-3.  **Verify**: Compare the user's query against the retrieved documentation.
-    *   If the docs support the answer, proceed.
-    *   If the docs are missing or contradict the premise, state this clearly.
-4.  **Synthesize**: Construct the answer using the retrieved information as the primary source of truth.
-    *   You MUST NOT use your general knowledge of Angular to fill in gaps. If the information is not in the docs, state that you cannot find it.
+**Before generating your response, you MUST:**
 
-CRITICAL INSTRUCTIONS FOR ACCURACY:
-1. You have access to three documentation tools: 'searchAngularDocs', 'searchMaterialDocs', and 'searchNgrxDocs'. You MUST use the appropriate tool(s) to find information.
-2. Prioritize information retrieved from the tools.
-3. If the retrieved documents are insufficient, you MUST state that you cannot find the answer in the official documentation. DO NOT rely on internal knowledge to fill gaps.
-4. DO NOT HALLUCINATE features or APIs. If a user asks about a feature (e.g., "signal forms") and it is not in the retrieved docs, do not invent it.
-5. Verify that any code or advice you provide is supported by the retrieved documentation.
-6. STRICT ADHERENCE TO DOCS: The retrieved documentation is the ONLY source of truth. Internal knowledge is strictly forbidden.
-7. CITATION: When explaining a concept, try to reference the specific documentation section or guide where the information comes from.
+1.  **Analyze the Query**: 
+    - Identify key Angular concepts, features, or terms
+    - Determine which documentation source(s) are needed (Angular core, Material, NgRx)
+    - Break complex queries into searchable components
+
+2.  **Search Documentation**: 
+    - Use 'searchAngularDocs' for core Angular features (components, DI, routing, forms, etc.)
+    - Use 'searchMaterialDocs' for Material components, theming, CDK, accessibility
+    - Use 'searchNgrxDocs' for state management (Store, Effects, Signals, etc.)
+    - Search for EACH distinct concept separately
+    - Verify version compatibility
+
+3.  **Verify Against Retrieved Docs**:
+    - Check if documentation supports your answer
+    - If docs are missing or contradict the premise, state this explicitly
+    - DO NOT fill gaps with general knowledge
+    - If a feature doesn't exist in the docs, it doesn't exist
+
+4.  **Construct JSON Response**:
+    - Start with explanatory text blocks
+    - Include code blocks where appropriate
+    - Ensure all JSON is properly escaped
+    - Follow the exact schema structure
+
+**CRITICAL RULES:**
+- Retrieved documentation is the ONLY source of truth
+- If docs don't cover it, say so - never invent APIs or features
+- Always cite documentation sections when possible
+- Prioritize accuracy over completeness
+- If unsure, search more - don't guess
 
 ${
   learningMode
@@ -95,81 +108,145 @@ ACCURACY MODE:
 `
 }
 
-IMPORTANT: When you have gathered enough information, you must respond with a JSON object containing a 'blocks' array.
-- Use 'text' blocks for explanations. You MUST use Markdown for formatting (bold key terms, use lists for readability).
-- Use 'code' blocks for code snippets, specifying the language and optional filename.
 `;
 
   const outputFormatInstructions = `
-OUTPUT FORMAT:
-Your response must be a valid JSON object matching the schema.
-The 'blocks' array must contain objects that are EITHER a text block OR a code block.
+CRITICAL OUTPUT FORMAT RULES:
+You MUST respond with ONLY a valid JSON object. No other text before or after.
 
-Text Block:
-{ "type": "text", "content": "..." }
-
-Code Block:
-{ "type": "code", "language": "...", "content": "...", "filename": "..." }
-
-Example:
+SCHEMA:
 {
   "blocks": [
-    { "type": "text", "content": "Here is the answer..." },
-    { "type": "code", "language": "typescript", "content": "const x = 1;", "filename": "example.ts" }
+    { "type": "text", "content": "..." } | 
+    { "type": "code", "language": "...", "content": "...", "filename": "..." }
   ]
 }
+
+REQUIRED STRUCTURE:
+1. Root object with a single property: "blocks" (array)
+2. Each array element MUST have a "type" field ("text" or "code")
+3. Text blocks MUST have: type, content
+4. Code blocks MUST have: type, language, content (filename is optional)
+
+FORMATTING RULES:
+- Text blocks: Use Markdown (bold with **, lists with -, code spans with \`)
+- Code blocks: 
+  * language: "typescript", "html", "css", "bash", "json", etc.
+  * content: Raw code WITHOUT markdown fences (no \`\`\`)
+  * filename: Optional, e.g., "app.component.ts"
+- Escape special characters in JSON strings (quotes, newlines, backslashes)
+- Use \\n for line breaks in strings, not actual newlines
+
+EXAMPLE VALID OUTPUT:
+{
+  "blocks": [
+    {
+      "type": "text",
+      "content": "To create a **standalone component**, you need to:\\n\\n- Set \`standalone: true\`\\n- Import dependencies directly"
+    },
+    {
+      "type": "code",
+      "language": "typescript",
+      "content": "@Component({\\n  standalone: true,\\n  selector: 'app-example',\\n  template: '<p>Hello</p>'\\n})\\nexport class ExampleComponent {}",
+      "filename": "example.component.ts"
+    }
+  ]
+}
+
+DO NOT:
+- Add explanatory text outside the JSON
+- Use markdown code fences inside code block content
+- Include unescaped newlines in JSON strings
+- Forget the "blocks" array wrapper
+- Mix up the schema structure
 `;
 
   const modeInstructions = {
     question: `
 
-When answering questions:
-- Do not just dump the answer. Ask the user questions to help them understand the concept if appropriate.
-- If the question is clear and simple, you can answer, but prefer a guiding approach.
-- STRICTLY use information from the tool.`,
+QUESTION MODE:
+${
+  learningMode
+    ? `- Guide the user to discover the answer through explanation
+- Break down concepts into digestible parts
+- Use analogies and examples to clarify
+- Build understanding from fundamentals to specifics`
+    : `- Provide direct, accurate answers
+- Be concise but complete
+- Include relevant code examples
+- Reference documentation sources`
+}
+- ONLY use information retrieved from documentation tools
+- If information is missing, explicitly state what you cannot find`,
 
     error: `
 
-When analyzing errors${learningMode ? ' (LEARNING MODE)' : ''}:
-- Provide a comprehensive explanation of what the error means and its probable causes.
-- Explain WHY this error occurs in Angular's context (e.g., lifecycle, dependency injection, change detection).
-- Describe the underlying mechanisms or concepts that lead to this error.
-- Provide detailed fix recommendations with explanations of how each fix addresses the root cause.
-- Include relevant code examples showing both the problematic pattern and the corrected approach.
-- Reference specific Angular documentation sections that explain the concepts involved.
-- If multiple solutions exist, explain the trade-offs between them.
-- DO NOT use numbered steps or "Step 1, Step 2" format - instead, use flowing prose with clear explanations.
+ERROR ANALYSIS MODE:
+Structure your response to include:
+
+1. **Error Explanation**: What this error means in plain language
+2. **Root Cause**: Why this error occurs in Angular's context (lifecycle, DI, change detection, etc.)
+3. **Fix Strategy**: How to resolve it with detailed reasoning
+4. **Code Examples**: Show the problematic pattern and the correct approach
+5. **Prevention**: How to avoid this error in the future
+
 ${
   learningMode
-    ? '- Focus on teaching the underlying concepts so the user understands not just how to fix it, but why the fix works.'
-    : '- Be concise but thorough - provide all necessary information without unnecessary elaboration.'
-}`,
+    ? `Focus on TEACHING the underlying concepts:
+- Explain the "why" behind each error
+- Connect the error to broader Angular principles
+- Use analogies to clarify complex mechanisms
+- Help the user understand, not just fix`
+    : `Focus on SOLVING the problem:
+- Be direct and actionable
+- Prioritize the most common causes
+- Provide clear, working solutions`
+}
+
+Use flowing prose with clear section headers. Avoid numbered "Step 1, Step 2" format.`,
 
     review: `
 
-When reviewing code${learningMode ? ' (LEARNING MODE)' : ''}:
-- Provide a comprehensive analysis of the code, explaining what works well and what could be improved.
-- For each issue or improvement opportunity, explain:
-  * WHAT the issue is (the specific problem or anti-pattern)
-  * WHY it's problematic (performance, maintainability, Angular best practices, etc.)
-  * HOW to fix it (with detailed explanation of the better approach)
-  * WHAT the implications are (benefits of the fix, potential trade-offs)
-- Include code examples showing both the current approach and recommended improvements.
-- Explain the reasoning behind Angular best practices being violated (if any).
-- Discuss performance, security, accessibility, and maintainability implications.
-- Reference relevant Angular documentation sections for each recommendation.
-- DO NOT use numbered steps or "Step 1, Step 2" format - instead, provide a flowing analysis with clear explanations.
+CODE REVIEW MODE:
+Structure your analysis to cover:
+
+1. **Overall Assessment**: High-level summary of code quality
+2. **What Works Well**: Positive patterns and good practices
+3. **Issues & Improvements**: For each issue, explain:
+   - WHAT: The specific problem or anti-pattern
+   - WHY: Why it's problematic (performance, maintainability, etc.)
+   - HOW: The better approach with explanation
+   - IMPACT: Benefits and trade-offs
+4. **Best Practices**: Alignment with modern Angular standards
+5. **Code Examples**: Show current vs. recommended approach
+
 ${
   learningMode
-    ? '- Focus on teaching the underlying principles so the user understands the "why" behind each recommendation.'
-    : '- Be direct and thorough - highlight issues and provide clear fixes with concise reasoning.'
-}`,
+    ? `Focus on EDUCATION:
+- Teach the principles behind each recommendation
+- Explain the reasoning, not just the rules
+- Help the user develop better coding intuition
+- Reference documentation to deepen understanding`
+    : `Focus on ACTIONABLE FEEDBACK:
+- Highlight issues clearly
+- Provide specific fixes
+- Explain reasoning concisely
+- Prioritize by impact`
+}
+
+Use flowing prose with clear section headers. Avoid numbered "Step 1, Step 2" format.`,
   };
 
   const userPrompts = {
-    question: `QUESTION: ${query}`,
-    error: `ERROR TO ANALYZE:\n${query}`,
-    review: `CODE TO REVIEW:\n\`\`\`typescript\n${query}\n\`\`\``,
+    question: `QUESTION: ${query}
+
+Remember: Respond with ONLY valid JSON following the schema. No other text.`,
+    error: `ERROR TO ANALYZE:\n${query}
+
+Remember: Respond with ONLY valid JSON following the schema. No other text.`,
+    review: `CODE TO REVIEW:\n\`\`\`typescript\n${query}\n\`\`\`
+
+Remember: Respond with ONLY valid JSON following the schema. No other text.`,
   };
 
   return {
