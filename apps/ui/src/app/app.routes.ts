@@ -1,14 +1,16 @@
 import { Route } from '@angular/router';
-import { HomeComponent } from './pages/home.component';
-import { SharedResultComponent } from './pages/shared-result.component';
 
 export const appRoutes: Route[] = [
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () =>
+      import('./pages/home.component').then((m) => m.HomeComponent),
   },
   {
     path: 'shared/:slug',
-    component: SharedResultComponent,
+    loadComponent: () =>
+      import('./pages/shared-result.component').then(
+        (m) => m.SharedResultComponent,
+      ),
   },
 ];

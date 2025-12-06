@@ -100,7 +100,9 @@ import { ChatStateService } from '../services/chat-state.service';
               />
             </div>
           </div>
-          <app-footer />
+          @defer (on idle) {
+            <app-footer />
+          }
         </footer>
       </main>
     </div>

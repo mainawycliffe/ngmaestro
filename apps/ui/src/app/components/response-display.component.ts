@@ -151,19 +151,27 @@ interface Interaction {
                   <!-- Action Buttons -->
                   @if (group.answer && !isString(group.answer.content)) {
                     <div class="action-buttons">
-                      <app-share-result
-                        [query]="asString(group.question.content)"
-                        [angularVersion]="selectedVersion()"
-                        [mode]="selectedMode()"
-                        [response]="{ blocks: asBlocks(group.answer.content) }"
-                        [learningMode]="isLearnMode()"
-                      />
-                      <app-bug-report
-                        [query]="asString(group.question.content)"
-                        [angularVersion]="selectedVersion()"
-                        [mode]="selectedMode()"
-                        [response]="{ blocks: asBlocks(group.answer.content) }"
-                      />
+                      @defer (on idle) {
+                        <app-share-result
+                          [query]="asString(group.question.content)"
+                          [angularVersion]="selectedVersion()"
+                          [mode]="selectedMode()"
+                          [response]="{
+                            blocks: asBlocks(group.answer.content),
+                          }"
+                          [learningMode]="isLearnMode()"
+                        />
+                        <app-bug-report
+                          [query]="asString(group.question.content)"
+                          [angularVersion]="selectedVersion()"
+                          [mode]="selectedMode()"
+                          [response]="{
+                            blocks: asBlocks(group.answer.content),
+                          }"
+                        />
+                      } @placeholder {
+                        <div style="height: 40px"></div>
+                      }
                     </div>
                   }
                 } @else if (isLoading() && $last) {
