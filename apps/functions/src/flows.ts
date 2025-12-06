@@ -6,6 +6,7 @@ import {
   oracleResponseSchema,
 } from './schemas';
 import { searchAngularDocs, searchMaterialDocs, searchNgrxDocs } from './tools';
+import { validateResponse, type ToolCall } from './validation';
 
 export const theOracleFlow = ai.defineFlow(
   {
@@ -57,8 +58,46 @@ export const theOracleFlow = ai.defineFlow(
       output: { format: 'json', schema: oracleResponseSchema },
       config: {
         temperature: 0.5,
+        thinkingConfig: {
+          thinkingBudget: 4096,
+          includeThoughts: false,
+        },
       },
     });
+
+    // Extract tool calls from response for validation
+    const toolCalls: ToolCall[] = [];
+
+    // Check if response includes tool request information
+    if (response.toolRequests && Array.isArray(response.toolRequests)) {
+      toolCalls.push(
+        ...response.toolRequests.map((req) => ({
+          name: req.toolRequest.name,
+          input: (req.toolRequest.input || {}) as Record<string, unknown>,
+        })),
+      );
+    }
+
+    // Validate the response (with type assertion since we know the schema is correct)
+    const validation = validateResponse(
+      response.output as { blocks: Array<{ type: string; content: string }> },
+      angularVersion,
+      toolCalls,
+    );
+
+    // Log validation results
+    if (!validation.isValid) {
+      console.error('Response validation failed:', {
+        errors: validation.errors,
+        warnings: validation.warnings,
+        searchMetrics: validation.searchMetrics,
+      });
+    } else if (validation.warnings.length > 0) {
+      console.warn('Response validation warnings:', {
+        warnings: validation.warnings,
+        searchMetrics: validation.searchMetrics,
+      });
+    }
 
     return {
       response: response.output,
