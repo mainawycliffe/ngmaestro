@@ -1,8 +1,8 @@
-# 🧙‍♂️ NgOracle
+# 🎓 NgMaestro
 
 > AI-powered Angular documentation assistant with semantic search and intelligent answers
 
-**NgOracle** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
+**NgMaestro** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
 
 ## ✨ Features
 
@@ -26,8 +26,8 @@
 
 ```bash
 # Clone and install
-git clone https://github.com/mainawycliffe/ng-lens.git
-cd ng-lens
+git clone https://github.com/mainawycliffe/ngmaestro.git
+cd ngmaestro
 pnpm install
 
 # Run dev server

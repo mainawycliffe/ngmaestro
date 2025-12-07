@@ -23,7 +23,7 @@ export interface BugReportData {
   providedIn: 'root',
 })
 export class BugReportService {
-  private readonly GITHUB_REPO = 'mainawycliffe/ng-lens';
+  private readonly GITHUB_REPO = 'mainawycliffe/ngmaestro';
   private readonly GITHUB_ISSUES_URL = `https://github.com/${this.GITHUB_REPO}/issues/new`;
 
   /**
@@ -102,7 +102,7 @@ export class BugReportService {
     }
 
     body += `---\n\n`;
-    body += `*This issue was auto-generated from the ng-lens UI*`;
+    body += `*This issue was auto-generated from the NgMaestro UI*`;
 
     return body;
   }

@@ -95,21 +95,21 @@ export class ChatStateService {
     effect(() => {
       const version = this.selectedVersion();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-version', version);
+        localStorage.setItem('ngmaestro-version', version);
       }
     });
 
     effect(() => {
       const mode = this.selectedMode();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-mode', mode);
+        localStorage.setItem('ngmaestro-mode', mode);
       }
     });
 
     effect(() => {
       const size = this.fontSize();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-font-size', size.toString());
+        localStorage.setItem('ngmaestro-font-size', size.toString());
         document.documentElement.style.setProperty(
           '--app-font-size',
           `${size}px`,
@@ -120,7 +120,7 @@ export class ChatStateService {
     effect(() => {
       const theme = this.theme();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-theme', theme);
+        localStorage.setItem('ngmaestro-theme', theme);
         if (theme === 'system') {
           document.documentElement.removeAttribute('data-theme');
         } else {
@@ -132,14 +132,14 @@ export class ChatStateService {
     effect(() => {
       const learnMode = this.isLearnMode();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-learn-mode', String(learnMode));
+        localStorage.setItem('ngmaestro-learn-mode', String(learnMode));
       }
     });
 
     effect(() => {
       const history = this.inputHistory();
       if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ng-lens-history', JSON.stringify(history));
+        localStorage.setItem('ngmaestro-history', JSON.stringify(history));
       }
     });
   }
@@ -388,14 +388,14 @@ export class ChatStateService {
   // Helpers
   private getInitialVersion(): string {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('ng-lens-version') || 'auto';
+      return localStorage.getItem('ngmaestro-version') || 'auto';
     }
     return 'auto';
   }
 
   private getInitialMode(): Mode {
     if (isPlatformBrowser(this.platformId)) {
-      const savedMode = localStorage.getItem('ng-lens-mode');
+      const savedMode = localStorage.getItem('ngmaestro-mode');
       if (savedMode && ['question', 'error', 'review'].includes(savedMode)) {
         return savedMode as Mode;
       }
@@ -405,7 +405,7 @@ export class ChatStateService {
 
   private getInitialFontSize(): number {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('ng-lens-font-size');
+      const saved = localStorage.getItem('ngmaestro-font-size');
       return saved ? parseInt(saved, 10) : 16;
     }
     return 16;
@@ -413,7 +413,7 @@ export class ChatStateService {
 
   private getInitialTheme(): 'light' | 'dark' | 'system' {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('ng-lens-theme');
+      const saved = localStorage.getItem('ngmaestro-theme');
       if (saved && ['light', 'dark', 'system'].includes(saved)) {
         return saved as 'light' | 'dark' | 'system';
       }

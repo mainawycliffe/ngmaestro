@@ -1,4 +1,4 @@
-# 📅 Project Plan: ng-lens
+# 📅 Project Plan: NgMaestro
 
 ## Phase 1: Backend & Data Configuration
 

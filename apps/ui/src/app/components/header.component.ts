@@ -35,10 +35,10 @@ interface AngularVersion {
             <div class="logo-icon-wrapper">
               <mat-icon class="logo-icon">auto_awesome</mat-icon>
             </div>
-            <span class="logo-text">NgOracle</span>
+            <span class="logo-text">NgMaestro</span>
           </div>
           <span class="tagline" role="doc-subtitle"
-            >Chat with Angular Docs, powered by Gemini</span
+            >Your AI Angular Teaching Assistant, powered by Gemini</span
           >
         </div>
 

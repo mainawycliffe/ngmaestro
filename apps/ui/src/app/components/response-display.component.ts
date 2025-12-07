@@ -202,7 +202,7 @@ interface Interaction {
       @if (interactions().length === 0) {
         <div class="empty-notebook">
           <div class="notebook-intro">
-            <h1>NgOracle</h1>
+            <h1>NgMaestro</h1>
             <p>AI-powered Angular Documentation Assistant</p>
           </div>
 

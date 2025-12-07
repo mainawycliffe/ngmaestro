@@ -21,7 +21,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         </p>
         <div class="footer-links">
           <a
-            href="https://github.com/mainawycliffe/ng-lens"
+            href="https://github.com/mainawycliffe/ngmaestro"
             target="_blank"
             rel="noopener noreferrer"
             class="footer-link"
@@ -31,7 +31,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
           </a>
           <span class="separator">•</span>
           <a
-            href="https://github.com/mainawycliffe/ng-lens/issues"
+            href="https://github.com/mainawycliffe/ngmaestro/issues"
             target="_blank"
             rel="noopener noreferrer"
             class="footer-link"
