@@ -203,7 +203,61 @@ interface Interaction {
         <div class="empty-notebook">
           <div class="notebook-intro">
             <h1>NgMaestro</h1>
-            <p>AI-powered Angular Documentation Assistant</p>
+            <p>Your AI Angular Teaching Assistant, powered by Gemini</p>
+          </div>
+
+          <div class="capabilities-section">
+            <h2>What I Can Help You With</h2>
+            <div class="capabilities-grid">
+              <div class="capability-card">
+                <mat-icon class="capability-icon">description</mat-icon>
+                <h3>Angular Documentation</h3>
+                <p>
+                  Search across Angular core docs, Angular Material, and NgRx
+                  with instant, version-specific answers
+                </p>
+              </div>
+              <div class="capability-card">
+                <mat-icon class="capability-icon">palette</mat-icon>
+                <h3>Material & CDK</h3>
+                <p>
+                  Get help with Material components, theming, accessibility,
+                  and CDK utilities
+                </p>
+              </div>
+              <div class="capability-card">
+                <mat-icon class="capability-icon">storage</mat-icon>
+                <h3>NgRx State Management</h3>
+                <p>
+                  Learn Store, Effects, Signals Store, and modern state
+                  management patterns
+                </p>
+              </div>
+              <div class="capability-card">
+                <mat-icon class="capability-icon">bug_report</mat-icon>
+                <h3>Error Analysis</h3>
+                <p>
+                  Paste error messages to get detailed explanations, root
+                  causes, and fixes
+                </p>
+              </div>
+              <div class="capability-card">
+                <mat-icon class="capability-icon">rate_review</mat-icon>
+                <h3>Code Review</h3>
+                <p>
+                  Submit code snippets for best practices review and modern
+                  Angular recommendations
+                </p>
+              </div>
+              <div class="capability-card">
+                <mat-icon class="capability-icon">image</mat-icon>
+                <h3>Visual Analysis</h3>
+                <p>
+                  Upload screenshots of UIs, diagrams, or error messages for
+                  multimodal assistance
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="examples-grid">
@@ -637,6 +691,63 @@ interface Interaction {
             font-size: 1.25rem;
             max-width: 600px;
             line-height: 1.5;
+          }
+        }
+
+        .capabilities-section {
+          width: 100%;
+          max-width: 1200px;
+          margin-bottom: 4rem;
+
+          h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: var(--mat-sys-on-surface);
+          }
+
+          .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+
+            .capability-card {
+              background: var(--mat-sys-surface-container-low);
+              border-radius: 12px;
+              padding: 1.5rem;
+              transition: all 0.2s ease;
+              border: 1px solid transparent;
+
+              &:hover {
+                background: var(--mat-sys-surface-container);
+                border-color: var(--mat-sys-outline-variant);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+              }
+
+              .capability-icon {
+                font-size: 32px;
+                width: 32px;
+                height: 32px;
+                color: var(--mat-sys-primary);
+                margin-bottom: 1rem;
+              }
+
+              h3 {
+                font-size: 1.125rem;
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: var(--mat-sys-on-surface);
+              }
+
+              p {
+                font-size: 0.875rem;
+                line-height: 1.5;
+                color: var(--mat-sys-on-surface-variant);
+                margin: 0;
+              }
+            }
           }
         }
 
