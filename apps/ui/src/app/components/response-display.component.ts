@@ -221,8 +221,8 @@ interface Interaction {
                 <mat-icon class="capability-icon">palette</mat-icon>
                 <h3>Material & CDK</h3>
                 <p>
-                  Get help with Material components, theming, accessibility,
-                  and CDK utilities
+                  Get help with Material components, theming, accessibility, and
+                  CDK utilities
                 </p>
               </div>
               <div class="capability-card">
