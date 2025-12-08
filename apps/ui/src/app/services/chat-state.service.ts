@@ -360,6 +360,7 @@ export class ChatStateService {
           newMsgs[lastIdx] = {
             ...newMsgs[lastIdx],
             content: result.response.blocks,
+            confidence: result.response.confidence,
           };
           return newMsgs;
         });

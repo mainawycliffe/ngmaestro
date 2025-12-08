@@ -16,6 +16,7 @@ import { MarkdownComponent } from 'ngx-markdown';
 import { EXAMPLE_PROMPTS } from '../config/examples.config';
 import { ChatBlock, ChatMessage, CodeBlock } from '../models/chat.types';
 import { BugReportComponent } from './bug-report.component';
+import { ConfidenceIndicatorComponent } from './confidence-indicator.component';
 import { ShareResultComponent } from './share-result.component';
 
 interface Interaction {
@@ -34,6 +35,7 @@ interface Interaction {
     MatExpansionModule,
     ShareResultComponent,
     BugReportComponent,
+    ConfidenceIndicatorComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -147,6 +149,13 @@ interface Interaction {
                       </div>
                     }
                   </div>
+
+                  <!-- Confidence Indicator -->
+                  @if (group.answer.confidence) {
+                    <app-confidence-indicator
+                      [confidence]="group.answer.confidence"
+                    />
+                  }
 
                   <!-- Action Buttons -->
                   @if (group.answer && !isString(group.answer.content)) {

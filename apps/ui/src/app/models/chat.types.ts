@@ -11,10 +11,22 @@ export interface ModeOption {
   icon: string;
 }
 
+export interface ConfidenceMetadata {
+  step0_intent_analysis: number;
+  step1_search_planning: number;
+  step2_documentation_search: number;
+  step25_pre_synthesis: number;
+  step3_synthesis: number;
+  step4_final_verification: number;
+  overall_confidence: number;
+  concerns?: string[];
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   content: string | ChatBlock[];
   image?: string;
+  confidence?: ConfidenceMetadata;
 }
 
 export type ChatBlock = TextBlock | CodeBlock;

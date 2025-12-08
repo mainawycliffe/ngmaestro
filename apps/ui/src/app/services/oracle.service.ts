@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { from, Observable } from 'rxjs';
-import { ChatBlock } from '../models/chat.types';
+import { ChatBlock, ConfidenceMetadata } from '../models/chat.types';
 
 export interface OracleInput {
   query: string;
@@ -13,7 +13,10 @@ export interface OracleInput {
 }
 
 export interface OracleResponse {
-  response: { blocks: ChatBlock[] };
+  response: {
+    blocks: ChatBlock[];
+    confidence: ConfidenceMetadata;
+  };
 }
 
 @Injectable({
@@ -25,7 +28,7 @@ export class OracleService {
   generate(input: OracleInput): Observable<OracleResponse> {
     const theOracle = httpsCallable<OracleInput, OracleResponse>(
       this.functions,
-      'theOracle'
+      'theOracle',
     );
     return from(theOracle(input).then((r) => r.data));
   }
