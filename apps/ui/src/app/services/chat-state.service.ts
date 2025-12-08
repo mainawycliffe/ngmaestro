@@ -423,7 +423,7 @@ export class ChatStateService {
 
   private getInitialLearnMode(): boolean {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('ng-lens-learn-mode');
+      const saved = localStorage.getItem('ngmaestro-learn-mode');
       return saved !== null ? saved === 'true' : true;
     }
     return true;
@@ -431,7 +431,7 @@ export class ChatStateService {
 
   private getInitialHistory(): string[] {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('ng-lens-history');
+      const saved = localStorage.getItem('ngmaestro-history');
       if (saved) {
         try {
           return JSON.parse(saved);
