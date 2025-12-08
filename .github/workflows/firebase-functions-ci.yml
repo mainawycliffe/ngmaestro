@@ -1,0 +1,52 @@
+name: Firebase Functions CI/CD
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "apps/functions/**"
+            - "firebase.json"
+            - "pnpm-lock.yaml"
+            - ".github/workflows/firebase-functions-ci.yml"
+    workflow_dispatch:
+
+env:
+    FIREBASE_PROJECT_ID: ng-lens
+    NODE_VERSION: 20
+    PNPM_VERSION: 9.15.0
+
+concurrency:
+    group: firebase-functions-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: ${{ env.PNPM_VERSION }}
+                  run_install: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Authenticate with Google Cloud
+              uses: google-github-actions/auth@v2
+              with:
+                  credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+                  project_id: ${{ env.FIREBASE_PROJECT_ID }}
+
+            - name: Deploy Firebase Functions
+              run: pnpm dlx firebase-tools@latest deploy --only functions --project $FIREBASE_PROJECT_ID --non-interactive
