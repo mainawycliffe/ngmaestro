@@ -12,13 +12,9 @@ export interface ModeOption {
 }
 
 export interface ConfidenceMetadata {
-  step0_intent_analysis: number;
-  step1_search_planning: number;
-  step2_documentation_search: number;
-  step25_pre_synthesis: number;
-  step3_synthesis: number;
-  step4_final_verification: number;
   overall_confidence: number;
+  docs_confidence?: number;
+  answer_confidence?: number;
   concerns?: string[];
 }
 

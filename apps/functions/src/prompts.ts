@@ -43,6 +43,11 @@ Your responses must be:
 
 **Primary Goal**: Provide accurate, documentation-backed answers that build confidence and understanding.
 
+## Tool Usage & Output Protocol (CRITICAL)
+1. **Tool First**: If you need to verify information (APIs, syntax, versions), you MUST call the appropriate tool (searchAngularDocs, searchMaterialDocs, searchNgrxDocs) BEFORE generating a final response.
+2. **No Chatter**: Do NOT output any conversational text, "thinking" text, or explanations outside of the tool calls or the final JSON response.
+3. **Final Output**: When you have sufficient information, generate the final response strictly adhering to the JSON schema.
+
 ## Version Compatibility
 ${
   isAuto
@@ -492,13 +497,9 @@ You have creative freedom to organize and present the following elements in the 
     { "type": "code", "language": "...", "content": "...", "filename": "..." }
   ],
   "confidence": {
-    "step0_intent_analysis": 8,
-    "step1_search_planning": 9,
-    "step2_documentation_search": 9,
-    "step25_pre_synthesis": 9,
-    "step3_synthesis": 9,
-    "step4_final_verification": 9,
     "overall_confidence": 9,
+    "docs_confidence": 9,
+    "answer_confidence": 9,
     "concerns": ["Optional: any remaining uncertainties"]
   }
 }
@@ -508,17 +509,13 @@ You have creative freedom to organize and present the following elements in the 
 
 **Root Structure**:
 - \`blocks\` (array): Content blocks for the response
-- \`confidence\` (object): Step-by-step confidence scores from your reasoning process
+- \`confidence\` (object): Confidence scores from your reasoning process
 
 **Confidence Reporting** (REQUIRED):
-You must report the confidence scores you assigned during each step of the reasoning protocol:
-- \`step0_intent_analysis\`: Your confidence from Step 0 (1-10)
-- \`step1_search_planning\`: Your confidence from Step 1 (1-10)
-- \`step2_documentation_search\`: Your confidence from Step 2 (1-10)
-- \`step25_pre_synthesis\`: Your confidence from Step 2.5 (1-10)
-- \`step3_synthesis\`: Your confidence from Step 3 (1-10)
-- \`step4_final_verification\`: Your confidence from Step 4 (1-10)
-- \`overall_confidence\`: Final overall confidence (1-10)
+You must report the following confidence scores (simplified to at most 3 fields):
+- \`overall_confidence\` (1-10): Overall confidence in the final response (REQUIRED)
+- \`docs_confidence\` (1-10): Confidence in documentation retrieval/completeness (optional but recommended)
+- \`answer_confidence\` (1-10): Confidence in the final answer quality (optional but recommended)
 - \`concerns\`: Optional array of remaining uncertainties or limitations
 
 **Blocks Structure**:
@@ -591,13 +588,9 @@ You must report the confidence scores you assigned during each step of the reaso
     }
   ],
   "confidence": {
-    "step0_intent_analysis": 9,
-    "step1_search_planning": 9,
-    "step2_documentation_search": 10,
-    "step25_pre_synthesis": 9,
-    "step3_synthesis": 9,
-    "step4_final_verification": 9,
     "overall_confidence": 9,
+    "docs_confidence": 9,
+    "answer_confidence": 9,
     "concerns": []
   }
 }
@@ -614,7 +607,7 @@ You must report the confidence scores you assigned during each step of the reaso
 ❌ Brief/minimal explanations
 ❌ Assuming user context knowledge
 
-**FINAL REMINDER**: Every response MUST include both blocks AND confidence. The confidence object with all 7 required fields is mandatory.
+**FINAL REMINDER**: Every response MUST include both blocks AND confidence. The confidence object MUST include \`overall_confidence\`; \`docs_confidence\` and \`answer_confidence\` are optional but recommended.
 `;
 
   const modeInstructions = {

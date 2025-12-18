@@ -4,7 +4,6 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -12,426 +11,312 @@ import { ConfidenceMetadata } from '../models/chat.types';
 
 @Component({
   selector: 'app-confidence-indicator',
-  imports: [
-    MatExpansionModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-  ],
+  standalone: true,
+  imports: [MatExpansionModule, MatIconModule, MatTooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="confidence-container">
-      <mat-expansion-panel class="confidence-panel">
+    <div class="confidence">
+      <mat-expansion-panel class="card" hideToggle>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <div class="confidence-header">
-              <mat-icon [class]="confidenceIconClass()">
-                {{ confidenceIcon() }}
+            <div class="header">
+              <mat-icon [class]="iconClass()" [matTooltip]="confidenceLevel()">
+                {{ icon() }}
               </mat-icon>
-              <span class="confidence-label">
-                Response Confidence: {{ overallConfidence() }}/10
-                <span class="confidence-description"
-                  >({{ confidenceLevel() }})</span
-                >
-              </span>
+              <div class="title">
+                <span>Confidence</span>
+                <span class="subtitle">
+                  Overall {{ overall() }}/10 · {{ confidenceLevel() }}
+                </span>
+              </div>
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <div class="confidence-details">
-          <div class="confidence-intro">
-            <p>
-              This shows the AI's self-assessed confidence at each step of its
-              reasoning process. Lower scores indicate areas of uncertainty.
-            </p>
+        <div class="grid">
+          <div class="metric">
+            <div class="metric-header">
+              <span>Overall</span>
+              <span class="score" [class]="scoreClass(overall())"
+                >{{ overall() }}/10</span
+              >
+            </div>
+            <div class="bar">
+              <div
+                class="fill"
+                [class]="scoreClass(overall())"
+                [style.width.%]="(overall() / 10) * 100"
+              ></div>
+            </div>
+            <p class="hint">Model's confidence in the full response.</p>
           </div>
 
-          <div class="confidence-steps">
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Intent Analysis</span>
+          @if (confidence().docs_confidence !== undefined) {
+            <div class="metric">
+              <div class="metric-header">
+                <span>Docs Retrieval</span>
                 <span
-                  class="step-score"
-                  [class]="getScoreClass(confidence().step0_intent_analysis)"
+                  class="score"
+                  [class]="scoreClass(confidence().docs_confidence!)"
                 >
-                  {{ confidence().step0_intent_analysis }}/10
+                  {{ confidence().docs_confidence }}/10
                 </span>
               </div>
-              <div class="step-bar">
+              <div class="bar">
                 <div
-                  class="step-fill"
-                  [class]="getScoreClass(confidence().step0_intent_analysis)"
-                  [style.width.%]="
-                    (confidence().step0_intent_analysis / 10) * 100
-                  "
+                  class="fill"
+                  [class]="scoreClass(confidence().docs_confidence!)"
+                  [style.width.%]="(confidence().docs_confidence! / 10) * 100"
                 ></div>
               </div>
-              <p class="step-description">
-                Understanding the core intent and scope of your question
-              </p>
+              <p class="hint">How well supporting docs were found.</p>
             </div>
+          }
 
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Search Planning</span>
+          @if (confidence().answer_confidence !== undefined) {
+            <div class="metric">
+              <div class="metric-header">
+                <span>Answer Quality</span>
                 <span
-                  class="step-score"
-                  [class]="getScoreClass(confidence().step1_search_planning)"
+                  class="score"
+                  [class]="scoreClass(confidence().answer_confidence!)"
                 >
-                  {{ confidence().step1_search_planning }}/10
+                  {{ confidence().answer_confidence }}/10
                 </span>
               </div>
-              <div class="step-bar">
+              <div class="bar">
                 <div
-                  class="step-fill"
-                  [class]="getScoreClass(confidence().step1_search_planning)"
-                  [style.width.%]="
-                    (confidence().step1_search_planning / 10) * 100
-                  "
+                  class="fill"
+                  [class]="scoreClass(confidence().answer_confidence!)"
+                  [style.width.%]="(confidence().answer_confidence! / 10) * 100"
                 ></div>
               </div>
-              <p class="step-description">
-                Planning the strategy to search documentation
-              </p>
-            </div>
-
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Documentation Search</span>
-                <span
-                  class="step-score"
-                  [class]="
-                    getScoreClass(confidence().step2_documentation_search)
-                  "
-                >
-                  {{ confidence().step2_documentation_search }}/10
-                </span>
-              </div>
-              <div class="step-bar">
-                <div
-                  class="step-fill"
-                  [class]="
-                    getScoreClass(confidence().step2_documentation_search)
-                  "
-                  [style.width.%]="
-                    (confidence().step2_documentation_search / 10) * 100
-                  "
-                ></div>
-              </div>
-              <p class="step-description">
-                Finding complete and relevant documentation
-              </p>
-            </div>
-
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Pre-Synthesis Verification</span>
-                <span
-                  class="step-score"
-                  [class]="getScoreClass(confidence().step25_pre_synthesis)"
-                >
-                  {{ confidence().step25_pre_synthesis }}/10
-                </span>
-              </div>
-              <div class="step-bar">
-                <div
-                  class="step-fill"
-                  [class]="getScoreClass(confidence().step25_pre_synthesis)"
-                  [style.width.%]="
-                    (confidence().step25_pre_synthesis / 10) * 100
-                  "
-                ></div>
-              </div>
-              <p class="step-description">
-                Verifying completeness before constructing answer
-              </p>
-            </div>
-
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Answer Synthesis</span>
-                <span
-                  class="step-score"
-                  [class]="getScoreClass(confidence().step3_synthesis)"
-                >
-                  {{ confidence().step3_synthesis }}/10
-                </span>
-              </div>
-              <div class="step-bar">
-                <div
-                  class="step-fill"
-                  [class]="getScoreClass(confidence().step3_synthesis)"
-                  [style.width.%]="(confidence().step3_synthesis / 10) * 100"
-                ></div>
-              </div>
-              <p class="step-description">
-                Accuracy and completeness of the synthesized answer
-              </p>
-            </div>
-
-            <div class="confidence-step">
-              <div class="step-header">
-                <span class="step-name">Final Verification</span>
-                <span
-                  class="step-score"
-                  [class]="getScoreClass(confidence().step4_final_verification)"
-                >
-                  {{ confidence().step4_final_verification }}/10
-                </span>
-              </div>
-              <div class="step-bar">
-                <div
-                  class="step-fill"
-                  [class]="getScoreClass(confidence().step4_final_verification)"
-                  [style.width.%]="
-                    (confidence().step4_final_verification / 10) * 100
-                  "
-                ></div>
-              </div>
-              <p class="step-description">
-                Final accuracy check before responding
-              </p>
-            </div>
-          </div>
-
-          @if (confidence().concerns && confidence().concerns!.length > 0) {
-            <div class="confidence-concerns">
-              <h4>
-                <mat-icon>warning</mat-icon>
-                Remaining Uncertainties
-              </h4>
-              <ul>
-                @for (concern of confidence().concerns; track $index) {
-                  <li>{{ concern }}</li>
-                }
-              </ul>
+              <p class="hint">Correctness and completeness of the reply.</p>
             </div>
           }
         </div>
+
+        @if (confidence().concerns?.length) {
+          <div class="concerns">
+            <div class="concerns-title">
+              <mat-icon>warning</mat-icon>
+              Remaining uncertainties
+            </div>
+            <ul>
+              @for (item of confidence().concerns; track $index) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          </div>
+        }
       </mat-expansion-panel>
     </div>
   `,
   styles: `
-    .confidence-container {
+    .confidence {
       margin-top: 1rem;
     }
 
-    .confidence-panel {
+    .card {
       background: var(--md-sys-color-surface-container-low);
-      box-shadow: none;
       border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: none;
     }
 
-    .confidence-header {
+    .header {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-
-      mat-icon {
-        font-size: 1.25rem;
-        width: 1.25rem;
-        height: 1.25rem;
-
-        &.high {
-          color: var(--md-sys-color-tertiary);
-        }
-
-        &.medium {
-          color: var(--md-sys-color-primary);
-        }
-
-        &.low {
-          color: var(--md-sys-color-error);
-        }
-      }
+      gap: 0.75rem;
     }
 
-    .confidence-label {
+    mat-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    mat-icon.high {
+      color: var(--md-sys-color-tertiary);
+    }
+
+    mat-icon.medium {
+      color: var(--md-sys-color-primary);
+    }
+
+    mat-icon.low {
+      color: var(--md-sys-color-error);
+    }
+
+    .title {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-weight: 600;
     }
 
-    .confidence-description {
-      font-size: 0.75rem;
+    .subtitle {
       color: var(--md-sys-color-on-surface-variant);
       font-weight: 400;
+      font-size: 0.85rem;
     }
 
-    .confidence-details {
-      padding: 1rem 0;
+    .grid {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
     }
 
-    .confidence-intro {
-      margin-bottom: 1.5rem;
-      padding: 0.75rem;
+    .metric {
       background: var(--md-sys-color-surface-container);
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--md-sys-color-on-surface-variant);
-
-      p {
-        margin: 0;
-      }
-    }
-
-    .confidence-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .confidence-step {
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: 0.75rem;
+      padding: 0.75rem;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
 
-    .step-header {
+    .metric-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.875rem;
-    }
-
-    .step-name {
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .step-score {
       font-weight: 600;
-      font-size: 0.8125rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-
-      &.high {
-        background: color-mix(
-          in srgb,
-          var(--md-sys-color-tertiary) 15%,
-          transparent
-        );
-        color: var(--md-sys-color-tertiary);
-      }
-
-      &.medium {
-        background: color-mix(
-          in srgb,
-          var(--md-sys-color-primary) 15%,
-          transparent
-        );
-        color: var(--md-sys-color-primary);
-      }
-
-      &.low {
-        background: color-mix(
-          in srgb,
-          var(--md-sys-color-error) 15%,
-          transparent
-        );
-        color: var(--md-sys-color-error);
-      }
     }
 
-    .step-bar {
+    .score {
+      padding: 0.2rem 0.55rem;
+      border-radius: 0.4rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: 1px solid transparent;
+    }
+
+    .score.high {
+      color: var(--md-sys-color-tertiary);
+      border-color: color-mix(
+        in srgb,
+        var(--md-sys-color-tertiary) 40%,
+        transparent
+      );
+      background: color-mix(
+        in srgb,
+        var(--md-sys-color-tertiary) 12%,
+        transparent
+      );
+    }
+
+    .score.medium {
+      color: var(--md-sys-color-primary);
+      border-color: color-mix(
+        in srgb,
+        var(--md-sys-color-primary) 40%,
+        transparent
+      );
+      background: color-mix(
+        in srgb,
+        var(--md-sys-color-primary) 12%,
+        transparent
+      );
+    }
+
+    .score.low {
+      color: var(--md-sys-color-error);
+      border-color: color-mix(
+        in srgb,
+        var(--md-sys-color-error) 40%,
+        transparent
+      );
+      background: color-mix(
+        in srgb,
+        var(--md-sys-color-error) 12%,
+        transparent
+      );
+    }
+
+    .bar {
       height: 0.5rem;
       background: var(--md-sys-color-surface-container-highest);
-      border-radius: 0.25rem;
+      border-radius: 0.4rem;
       overflow: hidden;
     }
 
-    .step-fill {
+    .fill {
       height: 100%;
-      transition: width 0.3s ease;
-
-      &.high {
-        background: var(--md-sys-color-tertiary);
-      }
-
-      &.medium {
-        background: var(--md-sys-color-primary);
-      }
-
-      &.low {
-        background: var(--md-sys-color-error);
-      }
+      transition: width 200ms ease;
     }
 
-    .step-description {
-      font-size: 0.75rem;
-      color: var(--md-sys-color-on-surface-variant);
+    .fill.high {
+      background: var(--md-sys-color-tertiary);
+    }
+
+    .fill.medium {
+      background: var(--md-sys-color-primary);
+    }
+
+    .fill.low {
+      background: var(--md-sys-color-error);
+    }
+
+    .hint {
       margin: 0;
+      font-size: 0.8rem;
+      color: var(--md-sys-color-on-surface-variant);
     }
 
-    .confidence-concerns {
-      margin-top: 1.5rem;
-      padding: 1rem;
+    .concerns {
+      margin-top: 1rem;
+      padding: 0.85rem;
+      border: 1px solid var(--md-sys-color-error);
+      border-radius: 0.6rem;
       background: color-mix(
         in srgb,
         var(--md-sys-color-error) 10%,
         transparent
       );
-      border: 1px solid var(--md-sys-color-error);
-      border-radius: 0.5rem;
+    }
 
-      h4 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin: 0 0 0.75rem 0;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--md-sys-color-error);
+    .concerns-title {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 700;
+      color: var(--md-sys-color-error);
+      margin-bottom: 0.35rem;
+    }
 
-        mat-icon {
-          font-size: 1.125rem;
-          width: 1.125rem;
-          height: 1.125rem;
-        }
-      }
-
-      ul {
-        margin: 0;
-        padding-left: 1.5rem;
-        font-size: 0.8125rem;
-        color: var(--md-sys-color-on-surface);
-
-        li {
-          margin-bottom: 0.25rem;
-        }
-      }
+    .concerns ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.85rem;
+      display: grid;
+      gap: 0.25rem;
     }
   `,
 })
 export class ConfidenceIndicatorComponent {
   confidence = input.required<ConfidenceMetadata>();
 
-  overallConfidence = computed(() => this.confidence().overall_confidence);
+  overall = computed(() => this.confidence().overall_confidence);
 
   confidenceLevel = computed(() => {
-    const score = this.overallConfidence();
+    const score = this.overall();
     if (score >= 9) return 'High';
     if (score >= 7) return 'Medium';
     return 'Low';
   });
 
-  confidenceIcon = computed(() => {
-    const score = this.overallConfidence();
+  icon = computed(() => {
+    const score = this.overall();
     if (score >= 9) return 'check_circle';
     if (score >= 7) return 'info';
     return 'warning';
   });
 
-  confidenceIconClass = computed(() => {
-    const score = this.overallConfidence();
-    if (score >= 9) return 'high';
-    if (score >= 7) return 'medium';
-    return 'low';
-  });
+  iconClass = computed(() => this.scoreClass(this.overall()));
 
-  getScoreClass(score: number): string {
+  scoreClass(score: number): 'high' | 'medium' | 'low' {
     if (score >= 9) return 'high';
     if (score >= 7) return 'medium';
     return 'low';
