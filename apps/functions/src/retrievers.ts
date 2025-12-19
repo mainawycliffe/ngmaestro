@@ -1,5 +1,5 @@
 import { defineFirestoreRetriever } from '@genkit-ai/firebase';
-import { vertexAI } from '@genkit-ai/vertexai';
+import { vertexAI } from '@genkit-ai/google-genai';
 import { db } from './config';
 import { ai } from './genkit';
 

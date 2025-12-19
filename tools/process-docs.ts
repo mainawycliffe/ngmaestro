@@ -1,4 +1,4 @@
-import { vertexAI } from '@genkit-ai/vertexai';
+import { vertexAI } from '@genkit-ai/google-genai';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { readFileSync, readdirSync, statSync } from 'fs';
