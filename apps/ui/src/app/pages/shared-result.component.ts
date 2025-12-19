@@ -49,9 +49,6 @@ import {
             <mat-card-subtitle>
               {{ result()!.mode | titlecase }} • Angular
               {{ result()!.angularVersion }}
-              @if (result()!.learningMode) {
-                • Learning Mode
-              }
             </mat-card-subtitle>
           </mat-card-header>
 

@@ -16,7 +16,6 @@ export interface SavedResult {
   query: string;
   angularVersion: string;
   mode: 'question' | 'error' | 'review';
-  learningMode?: boolean;
   response: {
     blocks: Array<
       | { type: 'text'; content: string }
@@ -73,7 +72,6 @@ export class SavedResultsService {
     mode: 'question' | 'error' | 'review',
     response: SavedResult['response'],
     options?: {
-      learningMode?: boolean;
       metadata?: SavedResult['metadata'];
     },
   ): Observable<{ slug: string; shareUrl: string }> {
@@ -92,9 +90,6 @@ export class SavedResultsService {
       createdAt: serverTimestamp(),
       viewCount: 0,
       isPublic: true,
-      ...(options?.learningMode !== undefined && {
-        learningMode: options.learningMode,
-      }),
       ...(options?.metadata && { metadata: options.metadata }),
     };
 

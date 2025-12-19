@@ -15,14 +15,9 @@ export const theOracleFlow = ai.defineFlow(
     outputSchema: oracleOutputSchema,
   },
   async (input) => {
-    const { query, angularVersion, mode, history, image, learningMode } = input;
+    const { query, angularVersion, mode, history, image } = input;
 
-    const { system, prompt } = buildPrompt(
-      mode,
-      query,
-      angularVersion,
-      learningMode,
-    );
+    const { system, prompt } = buildPrompt(mode, query, angularVersion);
 
     const messages: Array<{
       role: 'user' | 'model' | 'tool' | 'system';

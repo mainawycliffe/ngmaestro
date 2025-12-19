@@ -27,7 +27,6 @@ export class ChatStateService {
   readonly selectedImage = signal<string | null>(null);
   readonly isLoading = signal<boolean>(false);
   readonly messages = signal<ChatMessage[]>([]);
-  readonly isLearnMode = signal<boolean>(this.getInitialLearnMode());
 
   // Input History
   private inputHistory = signal<string[]>(this.getInitialHistory());
@@ -130,13 +129,6 @@ export class ChatStateService {
     });
 
     effect(() => {
-      const learnMode = this.isLearnMode();
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('ngmaestro-learn-mode', String(learnMode));
-      }
-    });
-
-    effect(() => {
       const history = this.inputHistory();
       if (isPlatformBrowser(this.platformId)) {
         localStorage.setItem('ngmaestro-history', JSON.stringify(history));
@@ -150,10 +142,6 @@ export class ChatStateService {
     this.messages.set([]);
     this.inputText.set('');
     this.selectedImage.set(null);
-  }
-
-  toggleLearnMode() {
-    this.isLearnMode.update((v) => !v);
   }
 
   setFontSize(size: number) {
@@ -324,7 +312,6 @@ export class ChatStateService {
     }
 
     const history = this.messages();
-    const learnMode = this.isLearnMode();
 
     // Add user message and placeholder model message
     this.messages.update((msgs) => [
@@ -341,7 +328,6 @@ export class ChatStateService {
       query: input,
       angularVersion: this.selectedVersion(),
       mode: this.selectedMode(),
-      learningMode: learnMode,
       history: history,
     };
 
@@ -420,14 +406,6 @@ export class ChatStateService {
       }
     }
     return 'system';
-  }
-
-  private getInitialLearnMode(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('ngmaestro-learn-mode');
-      return saved !== null ? saved === 'true' : true;
-    }
-    return true;
   }
 
   private getInitialHistory(): string[] {

@@ -16,6 +16,7 @@ export interface ConfidenceMetadata {
   docs_confidence?: number;
   answer_confidence?: number;
   concerns?: string[];
+  related_topics?: string[];
 }
 
 export interface ChatMessage {

@@ -17,6 +17,7 @@ import { EXAMPLE_PROMPTS } from '../config/examples.config';
 import { ChatBlock, ChatMessage, CodeBlock } from '../models/chat.types';
 import { BugReportComponent } from './bug-report.component';
 import { ConfidenceIndicatorComponent } from './confidence-indicator.component';
+import { RelatedTopicsComponent } from './related-topics.component';
 import { ShareResultComponent } from './share-result.component';
 
 interface Interaction {
@@ -36,6 +37,7 @@ interface Interaction {
     ShareResultComponent,
     BugReportComponent,
     ConfidenceIndicatorComponent,
+    RelatedTopicsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -157,6 +159,13 @@ interface Interaction {
                     />
                   }
 
+                  <!-- Related Topics -->
+                  @if (group.answer.confidence?.related_topics?.length) {
+                    <app-related-topics
+                      [topics]="group.answer.confidence!.related_topics!"
+                    />
+                  }
+
                   <!-- Action Buttons -->
                   @if (group.answer && !isString(group.answer.content)) {
                     <div class="action-buttons">
@@ -168,7 +177,6 @@ interface Interaction {
                           [response]="{
                             blocks: asBlocks(group.answer.content),
                           }"
-                          [learningMode]="isLearnMode()"
                         />
                         <app-bug-report
                           [query]="asString(group.question.content)"
@@ -860,7 +868,6 @@ export class ResponseDisplayComponent {
   isLoading = input.required<boolean>();
   selectedVersion = input.required<string>();
   selectedMode = input.required<'question' | 'error' | 'review'>();
-  isLearnMode = input.required<boolean>();
   cancelRequest = output<void>();
   retryRequest = output<void>();
   promptSelected = output<string>();

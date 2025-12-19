@@ -50,7 +50,6 @@ export class ShareResultComponent {
       | { type: 'code'; language: string; content: string; filename?: string }
     >;
   }>();
-  learningMode = input<boolean>(false);
 
   private savedResultsService = inject(SavedResultsService);
   private snackBar = inject(MatSnackBar);
@@ -68,9 +67,6 @@ export class ShareResultComponent {
         this.angularVersion(),
         this.mode(),
         this.response(),
-        {
-          learningMode: this.learningMode(),
-        },
       )
       .subscribe({
         next: ({ slug }) => {

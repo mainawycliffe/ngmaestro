@@ -64,17 +64,6 @@ import { Mode, ModeOption } from '../models/chat.types';
             >
               <mat-icon>add_comment</mat-icon>
             </button>
-
-            <div class="divider"></div>
-
-            <mat-slide-toggle
-              [checked]="isLearnMode()"
-              (change)="learnModeChange.emit($event.checked)"
-              color="primary"
-              class="mini-slide-toggle"
-            >
-              <span class="toggle-label">Learning Mode</span>
-            </mat-slide-toggle>
           </div>
         </div>
 
@@ -503,10 +492,6 @@ export class ModeInputComponent {
 
   // Version selection
   selectedVersion = input<string>('auto');
-
-  // Learn Mode
-  isLearnMode = input<boolean>(true);
-  learnModeChange = output<boolean>();
 
   // Image selection
   selectedImage = input<string | null>(null);

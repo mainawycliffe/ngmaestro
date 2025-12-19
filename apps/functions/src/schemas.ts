@@ -7,10 +7,6 @@ export const oracleInputSchema = z.object({
   angularVersion: z.string().describe('Angular version (18, 19, 20, or 21)'),
   mode: z.enum(['question', 'error', 'review']).describe('Interaction mode'),
   image: z.string().optional().describe('Base64 encoded image or data URL'),
-  learningMode: z
-    .boolean()
-    .optional()
-    .describe('If true, provide a step-by-step learning guide'),
   history: z
     .array(
       z.object({
@@ -61,6 +57,12 @@ export const oracleResponseSchema = z.object({
   confidence: confidenceMetadataSchema.describe(
     'Step-by-step confidence scores from reasoning process',
   ),
+  related_topics: z
+    .array(z.string())
+    .optional()
+    .describe(
+      '2-4 related Angular concepts/APIs found during docs search that user might explore next',
+    ),
 });
 
 export const oracleOutputSchema = z.object({
