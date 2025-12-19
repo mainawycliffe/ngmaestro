@@ -1,4 +1,4 @@
-import { vertexAI } from '@genkit-ai/vertexai';
+import { vertexAI } from '@genkit-ai/google-genai';
 import { genkit } from 'genkit';
 
 export const ai = genkit({

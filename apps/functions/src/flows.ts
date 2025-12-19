@@ -51,13 +51,7 @@ export const theOracleFlow = ai.defineFlow(
       messages,
       tools: [searchAngularDocs, searchMaterialDocs, searchNgrxDocs],
       output: { format: 'json', schema: oracleResponseSchema },
-      config: {
-        temperature: 0.5,
-        thinkingConfig: {
-          thinkingBudget: 4096,
-          includeThoughts: false,
-        },
-      },
+      config: { thinkingConfig: { thinkingLevel: 'MEDIUM' } },
     });
 
     // Debug: Log the raw response before validation
