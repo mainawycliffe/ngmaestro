@@ -3,5 +3,5 @@ import { genkit } from 'genkit';
 
 export const ai = genkit({
   plugins: [vertexAI({ location: 'us-central1' })],
-  model: vertexAI.model('gemini-3.0-flash'),
+  model: vertexAI.model('gemini-3-flash-preview'),
 });
