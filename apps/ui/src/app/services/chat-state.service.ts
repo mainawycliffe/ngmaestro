@@ -375,9 +375,9 @@ export class ChatStateService {
   // Helpers
   private getInitialVersion(): string {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('ngmaestro-version') || 'auto';
+      return localStorage.getItem('ngmaestro-version') || '21';
     }
-    return 'auto';
+    return '21';
   }
 
   private getInitialMode(): Mode {
