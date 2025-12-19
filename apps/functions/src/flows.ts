@@ -54,11 +54,6 @@ export const theOracleFlow = ai.defineFlow(
       config: { thinkingConfig: { thinkingLevel: 'HIGH' } },
     });
 
-    // Debug: Log the raw response before validation
-    console.log('Raw model output:', JSON.stringify(response.output, null, 2));
-    console.log('Response type:', typeof response.output);
-    console.log('Response is null:', response.output === null);
-
     // Extract tool calls from response for validation
     const toolCalls: ToolCall[] = [];
 
