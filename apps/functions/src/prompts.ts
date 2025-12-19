@@ -51,6 +51,17 @@ JSON only: { "blocks": [...], "confidence": { "overall_confidence": 1-10, "docs_
 - **Text blocks**: Max 150 words; start with doc citation; explain concepts clearly with context.
 - **Code blocks**: Complete, runnable snippets with all imports; no placeholders or "..." comments; include types.
 - **Code explanation**: ALWAYS precede code with explanation of what it does and why. ALWAYS follow code with summary of key learning points.
+- **Multi-file components**: When providing TypeScript, HTML, and CSS files, NEVER dump 3 code blocks consecutively. Instead, structure as:
+  1. Text block: "Let's start with the TypeScript component..." (explain component logic, properties, methods)
+  2. Code block: TypeScript file
+  3. Text block: "Now for the template..." (explain specific HTML features, bindings, directives used)
+  4. Code block: HTML file
+  5. Text block: "Finally, the styles..." (explain CSS classes, layout approach, styling decisions)
+  6. Code block: CSS file
+  7. Text block: Summary of how the three files work together
+- **Verbose code comments**: Use extensive, educational comments in code. Every non-trivial line should have a comment explaining WHAT it does and WHY. Think "teaching a junior developer" level of detail. Example:
+  - Good: "// Inject HttpClient to make API calls to our backend service"
+  - Bad: "// Inject HttpClient"
 - Escape newlines as \\n in JSON strings.
 
 ## Confidence Scoring (MANDATORY)
@@ -68,11 +79,11 @@ JSON only: { "blocks": [...], "confidence": { "overall_confidence": 1-10, "docs_
 
   const modeInstructions = {
     question: `\n## Q&A Mode (Teaching Focus)
-Teach the concept step-by-step. Text: Cite docs, explain concept with WHY and HOW (max 100 words). Code: Show practical example with imports. Follow with key takeaways.`,
+Teach the concept step-by-step. Text: Cite docs, explain concept with WHY and HOW (max 100 words). Code: Show practical example with verbose educational comments explaining each line. If multi-file component, explain each file separately (see Multi-file components rules). Follow with key takeaways.`,
     error: `\n## Error Mode (Teaching Focus)
-Help user understand the error and learn from it. Text: (1) Cite docs for correct usage, (2) Explain why error occurred (root cause), (3) How to prevent in future (max 150 words). Code: Fixed version with explanatory comments.`,
+Help user understand the error and learn from it. Text: (1) Cite docs for correct usage, (2) Explain why error occurred (root cause), (3) How to prevent in future (max 150 words). Code: Fixed version with verbose comments explaining what changed and why. If multi-file fix, explain each file's corrections separately.`,
     review: `\n## Review Mode (Teaching Focus)
-Teach best practices through code review. Text: (1) Cite docs for patterns/best practices, (2) Explain what needs improvement and why (max 100 words). Code: Improved version demonstrating best practices. Follow with learning points.`,
+Teach best practices through code review. Text: (1) Cite docs for patterns/best practices, (2) Explain what needs improvement and why (max 100 words). Code: Improved version with verbose comments explaining improvements. If multi-file component, explain improvements in each file separately. Follow with learning points.`,
   };
 
   const userPrompts = {
