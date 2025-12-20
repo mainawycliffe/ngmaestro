@@ -51,7 +51,7 @@ export const theOracleFlow = ai.defineFlow(
       messages,
       tools: [searchAngularDocs, searchMaterialDocs, searchNgrxDocs],
       output: { format: 'json', schema: oracleResponseSchema },
-      config: { thinkingConfig: { thinkingLevel: 'HIGH' } },
+      config: { thinkingConfig: { thinkingLevel: 'MEDIUM' } },
     });
 
     // Extract tool calls from response for validation
