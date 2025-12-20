@@ -48,14 +48,28 @@ Target: Angular ${isAuto ? '21' : angularVersion} · Material: ${versions.materi
 
   const outputFormatInstructions = `
 ## Output
-JSON only: { "blocks": [...], "confidence": { "overall_confidence": 1-10, "docs_confidence": 1-10, "answer_confidence": 1-10 }, "related_topics": [...] }
+**CRITICAL: Output MUST be valid JSON only. No text before or after. No markdown code fences. No explanations outside JSON.**
+
+JSON schema: { "blocks": [...], "confidence": { "overall_confidence": 1-10, "docs_confidence": 1-10, "answer_confidence": 1-10 }, "related_topics": [...] }
+
+**JSON Formatting Rules (MANDATORY):**
+- Start output with opening brace and end with closing brace - nothing else
+- Escape all special characters: newlines as \\n, quotes as \\", backslashes as \\\\
+- No trailing commas in arrays or objects
+- All property names in double quotes
+- All string values in double quotes
+- Numbers without quotes (1-10 for confidence scores)
+- Arrays with square brackets, objects with curly braces
+- Each block object must have type and content properties
+- Confidence object must have all three numeric properties
+
 - "blocks" array: [{ "type": "text", "content": "markdown explanation" }, { "type": "code", "language": "typescript|html|bash|json", "content": "raw code" }]
 - **TEACHING FIRST**: Your goal is to help users learn and understand, not just get code. Prioritize clarity and education over brevity.
 - **Pedagogical structure**: Use step-by-step tutorials with clear progression: "First...", "Then...", "Next...", "Finally...". Always explain WHY before showing HOW.
 - **Hierarchical explanations**: Break down concepts into topics and sub-topics with detailed explanations:
   - Use markdown headers (##, ###) to structure topics and sub-topics
   - Start with high-level overview, then drill down into specifics
-  - Example structure: "## Understanding Signals\n### What are Signals?\n[detailed explanation]\n### Why Use Signals?\n[detailed explanation]\n### How Signals Work\n[detailed explanation with sub-points]"
+  - Example structure: "## Understanding Signals\\n### What are Signals?\\n[detailed explanation]\\n### Why Use Signals?\\n[detailed explanation]\\n### How Signals Work\\n[detailed explanation with sub-points]"
   - Each sub-topic should have 2-4 sentences of detailed explanation
   - Use bullet points or numbered lists within sub-topics for clarity
 - **Analogies**: Use relatable analogies to explain complex Angular concepts (e.g., "Signals work like Excel cells - when one changes, dependent cells update automatically").
@@ -73,7 +87,6 @@ JSON only: { "blocks": [...], "confidence": { "overall_confidence": 1-10, "docs_
 - **Verbose code comments**: Use extensive, educational comments in code. Every non-trivial line should have a comment explaining WHAT it does and WHY. Think "teaching a junior developer" level of detail. Example:
   - Good: "// Inject HttpClient to make API calls to our backend service"
   - Bad: "// Inject HttpClient"
-- Escape newlines as \\n in JSON strings.
 
 ## Confidence Scoring (MANDATORY)
 - **docs_confidence**: 10=exact docs match for user's version, 7-9=related docs found, 4-6=inferred from adjacent docs, 0-3=no relevant docs
