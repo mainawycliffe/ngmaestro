@@ -104,7 +104,7 @@ import {
           <mat-card-actions>
             <button mat-flat-button color="primary" (click)="goHome()">
               <mat-icon>home</mat-icon>
-              Try NgMaestro
+              Try Angular Maestro
             </button>
           </mat-card-actions>
         </mat-card>

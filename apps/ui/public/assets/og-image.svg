@@ -43,7 +43,7 @@
         <!-- Title -->
         <text y="60" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
             font-weight="800" font-size="96" fill="white" letter-spacing="-2">
-            NgMaestro
+            Angular Maestro
         </text>
 
         <!-- Subtitle -->

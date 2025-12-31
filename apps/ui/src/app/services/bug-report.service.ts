@@ -102,7 +102,7 @@ export class BugReportService {
     }
 
     body += `---\n\n`;
-    body += `*This issue was auto-generated from the NgMaestro UI*`;
+    body += `*This issue was auto-generated from the Angular Maestro UI*`;
 
     return body;
   }

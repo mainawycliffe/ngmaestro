@@ -1,4 +1,4 @@
-# 📅 Project Plan: NgMaestro
+# 📅 Project Plan: Angular Maestro
 
 ## Phase 1: Backend & Data Configuration
 

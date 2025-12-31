@@ -1,8 +1,8 @@
-# 🎓 NgMaestro
+# 🎓 Angular Maestro
 
 > AI-powered Angular documentation assistant with semantic search and intelligent answers
 
-**NgMaestro** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
+**Angular Maestro** is an open-source tool that helps Angular developers get instant answers from Angular documentation using AI-powered semantic search. Ask questions, paste errors, or get code reviews with context from multiple Angular versions.
 
 ## ✨ Features
 
