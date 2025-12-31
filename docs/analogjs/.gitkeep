@@ -1,0 +1,5 @@
+# AnalogJS Documentation
+
+This directory contains fetched AnalogJS documentation from the official repository.
+
+Run `pnpm fetch:analogjs` or `pnpm fetch:all` to populate this directory.

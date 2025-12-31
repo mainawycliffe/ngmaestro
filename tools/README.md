@@ -26,6 +26,7 @@ pnpm fetch:all
 pnpm fetch:angular
 pnpm fetch:material
 pnpm fetch:ngrx
+pnpm fetch:analogjs
 ```
 
 ---
@@ -106,6 +107,31 @@ pnpm fetch:ngrx
 
 ---
 
+### fetch-analogjs-docs.sh
+
+Fetches AnalogJS documentation from the `analogjs/analog` repository.
+
+**Versions:** latest (main branch)  
+**Compatibility:** AnalogJS latest supports Angular 17-21  
+**Branch Mapping:**
+
+- latest → main
+
+**Content:** AnalogJS guides (routing, SSR, SSG, API routes, content routes, Vite integration, etc.)
+
+- `docs/analogjs/{latest,v1.x}/` (AnalogJS)
+  **Usage:**
+
+```bash
+./tools/fetch-analogjs-docs.sh
+# OR
+pnpm fetch:analogjs
+```
+
+**Output:** `docs/analogjs/{latest,v1.x}/`
+
+---
+
 ## Processing Script
 
 ### process-docs.ts
@@ -133,12 +159,13 @@ Collections:
   - angular-docs (Angular core documentation)
   - material-docs (Angular Material documentation)
   - ngrx-docs (NgRx documentation)
+  - analogjs-docs (AnalogJS documentation)
 
 Document ID: {source}_{version}_{path}_{chunkIndex}
 Fields:
   - id: string
-  - source: string ('angular' | 'material' | 'ngrx')
-  - version: string (v18, v19, v20, v21)
+  - source: string ('angular' | 'material' | 'ngrx' | 'analogjs')
+  - version: string (v18, v19, v20, v21 | latest)
   - path: string (relative file path)
   - content: string (chunk text)
   - embedding: vector (vector embedding)

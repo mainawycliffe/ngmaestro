@@ -1,6 +1,7 @@
 import { z } from 'genkit';
 import { ai } from './genkit';
 import {
+  analogjsDocsRetriever,
   angularDocsRetriever,
   materialDocsRetriever,
   ngrxDocsRetriever,
@@ -112,6 +113,47 @@ export const searchNgrxDocs = ai.defineTool(
       options: {
         where: {
           version: formattedVersion,
+        },
+        limit: 20,
+      },
+    });
+    return {
+      results: docs.map((d) => ({
+        content: d.text,
+        url: d.metadata?.url,
+      })),
+    };
+  },
+);
+
+export const searchAnalogJSDocs = ai.defineTool(
+  {
+    name: 'searchAnalogJSDocs',
+    description:
+      'Search the AnalogJS documentation. Use this to find information about the AnalogJS meta-framework, file-based routing, server-side rendering (SSR), static site generation (SSG), API routes, content routes, or Vite integration.',
+    inputSchema: z.object({
+      query: z.string().describe('The search query'),
+      version: z
+        .string()
+        .optional()
+        .describe('The AnalogJS version (e.g., "latest", "v1.x")'),
+    }),
+    outputSchema: z.object({
+      results: z.array(
+        z.object({
+          content: z.string(),
+          url: z.string().optional(),
+        }),
+      ),
+    }),
+  },
+  async ({ query, version = 'latest' }) => {
+    const docs = await ai.retrieve({
+      retriever: analogjsDocsRetriever,
+      query,
+      options: {
+        where: {
+          version: version,
         },
         limit: 20,
       },

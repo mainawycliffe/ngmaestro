@@ -7,6 +7,7 @@
     "fetch:angular": "./tools/fetch-docs.sh",
     "fetch:material": "./tools/fetch-material-docs.sh",
     "fetch:ngrx": "./tools/fetch-ngrx-docs.sh",
+    "fetch:analogjs": "./tools/fetch-analogjs-docs.sh",
     "ingest-docs": "tsx tools/process-docs.ts"
   },
   "private": true,

@@ -32,3 +32,13 @@ export const ngrxDocsRetriever = defineFirestoreRetriever(ai, {
   embedder: vertexAI.embedder('text-embedding-004'),
   distanceMeasure: 'COSINE',
 });
+
+export const analogjsDocsRetriever = defineFirestoreRetriever(ai, {
+  name: 'analogjsDocsRetriever',
+  firestore: db,
+  collection: 'analogjs-docs',
+  contentField: 'content',
+  vectorField: 'embedding',
+  embedder: vertexAI.embedder('text-embedding-004'),
+  distanceMeasure: 'COSINE',
+});

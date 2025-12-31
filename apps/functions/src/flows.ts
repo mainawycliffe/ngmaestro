@@ -5,7 +5,12 @@ import {
   oracleOutputSchema,
   oracleResponseSchema,
 } from './schemas';
-import { searchAngularDocs, searchMaterialDocs, searchNgrxDocs } from './tools';
+import {
+  searchAnalogJSDocs,
+  searchAngularDocs,
+  searchMaterialDocs,
+  searchNgrxDocs,
+} from './tools';
 import { validateResponse, type ToolCall } from './validation';
 
 export const theOracleFlow = ai.defineFlow(
@@ -49,7 +54,12 @@ export const theOracleFlow = ai.defineFlow(
     const response = await ai.generate({
       system,
       messages,
-      tools: [searchAngularDocs, searchMaterialDocs, searchNgrxDocs],
+      tools: [
+        searchAngularDocs,
+        searchMaterialDocs,
+        searchNgrxDocs,
+        searchAnalogJSDocs,
+      ],
       output: { format: 'json', schema: oracleResponseSchema },
       config: { thinkingConfig: { thinkingLevel: 'HIGH' } },
     });

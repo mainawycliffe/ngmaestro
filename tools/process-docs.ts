@@ -32,7 +32,7 @@ console.log(`Project: ${projectId}, Location: ${location}`);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Documentation source types
-type DocSource = 'angular' | 'material' | 'ngrx';
+type DocSource = 'angular' | 'material' | 'ngrx' | 'analogjs';
 
 // Map source to collection name
 const getCollectionName = (source: DocSource): string => {
@@ -43,6 +43,8 @@ const getCollectionName = (source: DocSource): string => {
       return 'material-docs';
     case 'ngrx':
       return 'ngrx-docs';
+    case 'analogjs':
+      return 'analogjs-docs';
   }
 };
 
@@ -201,6 +203,8 @@ function generateUrl(source: DocSource, relativePath: string): string {
       return `https://material.angular.io/${pathWithoutExt}`;
     case 'ngrx':
       return `https://ngrx.io/guide/${pathWithoutExt}`;
+    case 'analogjs':
+      return `https://analogjs.org/docs/${pathWithoutExt}`;
     default:
       return '';
   }
@@ -324,6 +328,13 @@ async function main() {
     const versionDir = join(docsPath, 'ngrx', version);
     await processVersion('ngrx', version, versionDir);
   }
+
+  // Process AnalogJS documentation
+  console.log('\n\nProcessing AnalogJS Documentation');
+  console.log('----------------------------------');
+  const analogjsVersion = 'latest';
+  const analogjsDir = join(docsPath, 'analogjs', analogjsVersion);
+  await processVersion('analogjs', analogjsVersion, analogjsDir);
 
   console.log('\n================================================');
   console.log('✓ All documentation processed successfully!');
