@@ -24,8 +24,38 @@ export class HighlightDirective {
     this.element.nativeElement.style.color = 'red';
   }
 }
-
 ```
+
+## Inject the host element's tag name
+
+When you need the tag name of a host element, inject it using the `HOST_TAG_NAME` token.
+
+```ts
+import {Directive, HOST_TAG_NAME, inject} from '@angular/core';
+
+@Directive({
+  selector: '[roleButton]',
+})
+export class RoleButtonDirective {
+  private tagName = inject(HOST_TAG_NAME);
+
+  onAction() {
+    switch (this.tagName) {
+      case 'button':
+        // Handle button action
+        break;
+      case 'a':
+        // Handle anchor action
+        break;
+      default:
+        // Handle other elements
+        break;
+    }
+  }
+}
+```
+
+NOTE: If the host element might not have a tag name (e.g., `ng-container` or `ng-template`), make the injection optional.
 
 ## Resolve circular dependencies with a forward reference
 

@@ -53,13 +53,13 @@ Builders can be published to `npm`, see [Publishing your Library](tools/librarie
 As an example, create a builder that copies a file to a new location.
 To create a builder, use the `createBuilder()` CLI Builder function, and return a `Promise<BuilderOutput>` object.
 
-<docs-code header="src/my-builder.ts (builder skeleton)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" visibleRegion="builder-skeleton"/>
+<docs-code header="src/my-builder.ts (builder skeleton)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" region="builder-skeleton"/>
 
 Now let's add some logic to it.
 The following code retrieves the source and destination file paths from user options and copies the file from the source to the destination \(using the [Promise version of the built-in NodeJS `copyFile()` function](https://nodejs.org/api/fs.html#fs_fspromises_copyfile_src_dest_mode)\).
 If the copy operation fails, it returns an error with a message about the underlying problem.
 
-<docs-code header="src/my-builder.ts (builder)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" visibleRegion="builder"/>
+<docs-code header="src/my-builder.ts (builder)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" region="builder"/>
 
 ### Handling output
 
@@ -70,7 +70,7 @@ This also lets the builder itself be executed in a separate process, even if the
 
 You can retrieve a `Logger` instance from the context.
 
-<docs-code header="src/my-builder.ts (handling output)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" visibleRegion="handling-output"/>
+<docs-code header="src/my-builder.ts (handling output)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" region="handling-output"/>
 
 ### Progress and status reporting
 
@@ -87,7 +87,7 @@ HELPFUL: There's no guarantee that a long string will be shown entirely; it coul
 
 Pass an empty string to remove the status.
 
-<docs-code header="src/my-builder.ts (progress reporting)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" visibleRegion="progress-reporting"/>
+<docs-code header="src/my-builder.ts (progress reporting)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" region="progress-reporting"/>
 
 ## Builder input
 
@@ -105,7 +105,6 @@ a `source` and a `destination`, each of which are a string.
 You can provide the following schema for type validation of these values.
 
 ```json {header: "schema.json"}
-
 {
   "$schema": "http://json-schema.org/schema",
   "type": "object",
@@ -128,7 +127,6 @@ To link our builder implementation with its schema and name, you need to create 
 Create a file named `builders.json` that looks like this:
 
 ```json {header: "builders.json"}
-
 {
   "builders": {
     "copy": {
@@ -160,7 +158,7 @@ The first part of this is the package name and the second part is the builder na
 
 These values are accessed on `options.source` and `options.destination`.
 
-<docs-code header="src/my-builder.ts (report status)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" visibleRegion="report-status"/>
+<docs-code header="src/my-builder.ts (report status)" path="adev/src/content/examples/cli-builder/src/my-builder.ts" region="report-status"/>
 
 ### Target configuration
 
@@ -302,27 +300,24 @@ This target tells the builder to copy the `package.json` file.
   - `source` - The existing file you are copying.
   - `destination` - The path you want to copy to.
 
-< header="angular.json" language="json">
-
+```json {header: "angular.json"}
 {
-"projects": {
-"builder-test": {
-"architect": {
-"copy-package": {
-"builder": "@example/copy-file:copy",
-"options": {
-"source": "package.json",
-"destination": "package-copy.json"
-}
-},
-
+  "projects": {
+    "builder-test": {
+      "architect": {
+        "copy-package": {
+          "builder": "@example/copy-file:copy",
+          "options": {
+            "source": "package.json",
+            "destination": "package-copy.json"
+          }
+        }
         // Existing targets...
       }
     }
-
+  }
 }
-}
-</docs-code>
+```
 
 ### Running the builder
 

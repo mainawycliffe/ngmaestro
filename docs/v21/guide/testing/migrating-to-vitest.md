@@ -181,6 +181,7 @@ You can use the following options to customize the schematic's behavior:
 | `--file-suffix <suffix>` | Specify a different file suffix for test files. <br> Example: `--file-suffix=.test.ts`              |
 | `--add-imports`          | Add explicit `vitest` imports if you have disabled globals in your Vitest configuration.            |
 | `--verbose`              | See detailed logging of all transformations applied.                                                |
+| `--browser-mode`         | If you intend to run the tests in browser mode.                                                     |
 
 ### After migrating
 
@@ -211,7 +212,7 @@ Provide a direct path to a Vitest configuration file in your `angular.json`:
       "architect": {
         "test": {
           "builder": "@angular/build:unit-test",
-          "options": { "runnerConfig": "vitest.config.ts" }
+          "options": {"runnerConfig": "vitest.config.ts"}
         }
       }
     }

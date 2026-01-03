@@ -7,9 +7,10 @@
       [cdkDropListData]="items"
       class="example-list"
       cdkDropListSortingDisabled
-      (cdkDropListDropped)="drop($event)">
+      (cdkDropListDropped)="drop($event)"
+    >
       @for (item of items; track item) {
-        <div class="example-box" cdkDrag>{{item}}</div>
+        <div class="example-box" cdkDrag>{{ item }}</div>
       }
     </div>
   </div>
@@ -21,9 +22,10 @@
       cdkDropList
       [cdkDropListData]="basket"
       class="example-list"
-      (cdkDropListDropped)="drop($event)">
+      (cdkDropListDropped)="drop($event)"
+    >
       @for (item of basket; track item) {
-        <div class="example-box" cdkDrag>{{item}}</div>
+        <div class="example-box" cdkDrag>{{ item }}</div>
       }
     </div>
   </div>

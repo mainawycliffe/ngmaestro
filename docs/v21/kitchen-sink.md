@@ -161,21 +161,28 @@ We also have styling for the terminal, just set the language as `shell`:
 npm install @angular/material --save
 ```
 
+You can style standard Markdown triple backticks with attributes for enhanced presentation:
+
+```ts {header:"Awesome Title", linenums, highlight="[2]", hideCopy}
+console.log('Hello, World!');
+console.log('Awesome Angular Docs!');
+```
+
 #### `<docs-code>` Attributes
 
-| Attributes      | Type                 | Details                                              |
-| :-------------- | :------------------- | :--------------------------------------------------- |
-| code            | `string`             | Anything between tags is treated as code             |
-| `path`          | `string`             | Path to code example (root: `content/examples/`)     |
-| `header`        | `string`             | Title of the example (default: `file-name`)          |
-| `language`      | `string`             | code language                                        |
-| `linenums`      | `boolean`            | (False) displays line numbers                        |
-| `highlight`     | `string of number[]` | lines highlighted                                    |
-| `diff`          | `string`             | path to changed code                                 |
-| `visibleLines`  | `string of number[]` | range of lines for collapse mode                     |
-| `visibleRegion` | `string`             | **DEPRECATED** FOR `visibleLines`                    |
-| `preview`       | `boolean`            | (False) display preview                              |
-| `hideCode`      | `boolean`            | (False) Whether to collapse code example by default. |
+| Attributes     | Type                 | Details                                              |
+| :------------- | :------------------- | :--------------------------------------------------- |
+| code           | `string`             | Anything between tags is treated as code             |
+| `path`         | `string`             | Path to code example (root: `content/examples/`)     |
+| `header`       | `string`             | Title of the example (default: `file-name`)          |
+| `language`     | `string`             | code language                                        |
+| `linenums`     | `boolean`            | (False) displays line numbers                        |
+| `highlight`    | `string of number[]` | lines highlighted                                    |
+| `diff`         | `string`             | path to changed code                                 |
+| `visibleLines` | `string of number[]` | range of lines for collapse mode                     |
+| `region`       | `string`             | only show the provided region.                       |
+| `preview`      | `boolean`            | (False) display preview                              |
+| `hideCode`     | `boolean`            | (False) Whether to collapse code example by default. |
 
 ### Multifile examples
 
@@ -364,3 +371,26 @@ This can be used to separate page sections, like we're about to do below. These 
 <hr/>
 
 The end!
+
+## Prefer / Avoid
+
+```ts {prefer}
+const foo = 'bar';
+```
+
+```ts {avoid}
+const bar = 'foo';
+```
+
+```ts {avoid, header: 'with a header'}
+const baz = 42;
+```
+
+<docs-code
+  path="adev/src/content/examples/hello-world/src/app/app.component-old.ts"
+  header="A styled code example"
+  language='ts'
+  linenums
+  highlight="[[3,7], 9]"
+  prefer>
+</docs-code>

@@ -46,17 +46,17 @@ While TypeScript infers types from object literals, defining explicit types impr
 
 ```ts
 interface LoginData {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export class LoginComponent {
   loginModel = signal<LoginData>({
     email: '',
-    password: ''
-  })
+    password: '',
+  });
 
-  loginForm = form(this.loginModel)
+  loginForm = form(this.loginModel);
 }
 ```
 
@@ -64,10 +64,10 @@ With explicit types, the field tree provides full type safety. Accessing `loginF
 
 ```ts
 // TypeScript knows this is FieldTree<string>
-const emailField = loginForm.email
+const emailField = loginForm.email;
 
 // TypeScript error: Property 'username' does not exist
-const usernameField = loginForm.username
+const usernameField = loginForm.username;
 ```
 
 ### Initializing all fields
@@ -79,50 +79,34 @@ Form models should provide initial values for all fields you want to include in 
 const userModel = signal({
   name: '',
   email: '',
-  age: 0
-})
+  age: 0,
+});
 
 // Avoid: Missing initial value
 const userModel = signal({
   name: '',
-  email: ''
+  email: '',
   // age field is not defined - cannot access userForm.age
-})
+});
 ```
 
 For optional fields, explicitly set them to `null` or an empty value:
 
 ```ts
 interface UserData {
-  name: string
-  email: string
-  phoneNumber: string | null
+  name: string;
+  email: string;
+  phoneNumber: string | null;
 }
 
 const userModel = signal<UserData>({
   name: '',
   email: '',
-  phoneNumber: null
-})
+  phoneNumber: null,
+});
 ```
 
 Fields set to `undefined` are excluded from the field tree. A model with `{value: undefined}` behaves identically to `{}` - accessing the field returns `undefined` rather than a `FieldTree`.
-
-### Dynamic field addition
-
-You can dynamically add fields by updating the model with new properties. The field tree automatically updates to include new fields when they appear in the model value.
-
-```ts
-// Start with just email
-const model = signal({ email: '' })
-const myForm = form(model)
-
-// Later, add a password field
-model.update(current => ({ ...current, password: '' }))
-// myForm.password is now available
-```
-
-This pattern is useful when fields become relevant based on user choices or loaded data.
 
 ## Reading model values
 
@@ -176,12 +160,6 @@ TIP: Field state includes many more signals beyond `value()`, such as validation
 
 ## Updating form models programmatically
 
-Form models update through programmatic mechanisms:
-
-1. [Replace the entire form model](#replacing-form-models-with-set) with `set()`
-2. [Update one or more fields](#update-one-or-more-fields-with-update) with `update()`
-3. [Update a single field directly](#update-a-single-field-directly-with-set) through field state
-
 ### Replacing form models with `set()`
 
 Use `set()` on the form model to replace the entire value:
@@ -206,22 +184,7 @@ resetForm() {
 
 This approach works well when loading data from an API or resetting the entire form.
 
-### Update one or more fields with `update()`
-
-Use `update()` to modify specific fields while preserving others:
-
-```ts
-updateEmail(newEmail: string) {
-  this.userModel.update(current => ({
-    ...current,
-    email: newEmail,
-  }));
-}
-```
-
-This pattern is useful when you need to change one or more fields based on the current model state.
-
-### Update a single field directly with `set()`
+### Update a single field directly with `set()` or `update()`
 
 Use `set()` on individual field values to directly update the field state:
 
@@ -231,8 +194,7 @@ clearEmail() {
 }
 
 incrementAge() {
-  const currentAge = this.userForm.age().value();
-  this.userForm.age().value.set(currentAge + 1);
+  this.userForm.age().value.update(currentAge => currentAge + 1);
 }
 ```
 
@@ -247,19 +209,19 @@ export class UserProfileComponent {
   userModel = signal({
     name: '',
     email: '',
-    bio: ''
-  })
+    bio: '',
+  });
 
-  userForm = form(this.userModel)
-  private userService = inject(UserService)
+  userForm = form(this.userModel);
+  private userService = inject(UserService);
 
   ngOnInit() {
-    this.loadUserProfile()
+    this.loadUserProfile();
   }
 
   async loadUserProfile() {
-    const userData = await this.userService.getUserProfile()
-    this.userModel.set(userData)
+    const userData = await this.userService.getUserProfile();
+    this.userModel.set(userData);
   }
 }
 ```
@@ -305,7 +267,7 @@ export class UserComponent {
   userForm = form(this.userModel)
 
   setName(name: string) {
-    this.userModel.update(current => ({ ...current, name }))
+    this.userForm.name().value.set(name);
     // Input automatically displays 'Bob'
   }
 }
@@ -329,8 +291,8 @@ const userModel = signal({
   street: '',
   city: '',
   state: '',
-  zip: ''
-})
+  zip: '',
+});
 ```
 
 Nested models group related fields:
@@ -344,9 +306,9 @@ const userModel = signal({
     street: '',
     city: '',
     state: '',
-    zip: ''
-  }
-})
+    zip: '',
+  },
+});
 ```
 
 **Use flat structures when:**
@@ -369,19 +331,19 @@ You can access nested fields by following the object path:
 const userModel = signal({
   profile: {
     firstName: '',
-    lastName: ''
+    lastName: '',
   },
   settings: {
     theme: 'light',
-    notifications: true
-  }
-})
+    notifications: true,
+  },
+});
 
-const userForm = form(userModel)
+const userForm = form(userModel);
 
 // Access nested fields
-userForm.profile.firstName // FieldTree<string>
-userForm.settings.theme // FieldTree<string>
+userForm.profile.firstName; // FieldTree<string>
+userForm.settings.theme; // FieldTree<string>
 ```
 
 In templates, you bind nested fields the same way as top-level fields:
@@ -407,124 +369,19 @@ Models can include arrays for collections of items:
 ```ts
 const orderModel = signal({
   customerName: '',
-  items: [{ product: '', quantity: 0, price: 0 }]
-})
+  items: [{product: '', quantity: 0, price: 0}],
+});
 
-const orderForm = form(orderModel)
+const orderForm = form(orderModel);
 
 // Access array items by index
-orderForm.items[0].product // FieldTree<string>
-orderForm.items[0].quantity // FieldTree<number>
+orderForm.items[0].product; // FieldTree<string>
+orderForm.items[0].quantity; // FieldTree<number>
 ```
 
 Array items containing objects automatically receive tracking identities, which helps maintain field state even when items change position in the array. This ensures validation state and user interactions persist correctly when arrays are reordered.
 
 <!-- TBD: For dynamic arrays and complex array operations, see the [Working with arrays guide](guide/forms/signals/arrays). -->
-
-## Model design best practices
-
-Well-designed form models make forms easier to maintain and extend. Follow these patterns when designing your models.
-
-### Use specific types
-
-Always define interfaces or types for your models as shown in [Using TypeScript types](#using-typescript-types). Explicit types provide better IntelliSense, catch errors at compile time, and serve as documentation for what data the form contains.
-
-### Initialize all fields
-
-Provide initial values for every field in your model:
-
-```ts
-// Good: All fields initialized
-const taskModel = signal({
-  title: '',
-  description: '',
-  priority: 'medium',
-  completed: false
-})
-```
-
-```ts
-// Avoid: Partial initialization
-const taskModel = signal({
-  title: ''
-  // Missing description, priority, completed
-})
-```
-
-Missing initial values mean those fields won't exist in the field tree, making them inaccessible for form interactions.
-
-### Keep models focused
-
-Each model should represent a single form or a cohesive set of related data:
-
-```ts
-// Good: Focused on login
-const loginModel = signal({
-  email: '',
-  password: ''
-})
-```
-
-```ts
-// Avoid: Mixing unrelated concerns
-const appModel = signal({
-  // Login data
-  email: '',
-  password: '',
-  // User preferences
-  theme: 'light',
-  language: 'en',
-  // Shopping cart
-  cartItems: []
-})
-```
-
-Separate models for different concerns makes forms easier to understand and reuse. Create multiple forms if you're managing distinct sets of data.
-
-### Consider validation requirements
-
-Design models with validation in mind. Group fields that validate together:
-
-```ts
-// Good: Password fields grouped for comparison
-interface PasswordChangeData {
-  currentPassword: string
-  newPassword: string
-  confirmPassword: string
-}
-```
-
-This structure makes cross-field validation (like checking if `newPassword` matches `confirmPassword`) more natural.
-
-### Plan for initial state
-
-Consider whether your form starts empty or pre-populated:
-
-```ts
-// Form that starts empty (new user)
-const newUserModel = signal({
-  name: '',
-  email: '',
-});
-
-// Form that loads existing data
-const editUserModel = signal({
-  name: '',
-  email: '',
-});
-
-// Later, in ngOnInit:
-ngOnInit() {
-  this.loadExistingUser();
-}
-
-async loadExistingUser() {
-  const user = await this.userService.getUser(this.userId);
-  this.editUserModel.set(user);
-}
-```
-
-For forms that always start with existing data, you might wait to render the form until data loads in order to avoid a flash of empty fields.
 
 ## Next steps
 

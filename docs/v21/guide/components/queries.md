@@ -7,7 +7,7 @@ A component can define **queries** that find child elements and read values from
 Developers most commonly use queries to retrieve references to child components, directives, DOM elements, and more.
 
 All query functions return signals that reflect the most up-to-date results. You can read the
-result by calling the signal function, including in reactive contexts like `computed` and `effect`.
+result by calling the signal function, including in [reactive contexts](guide/signals#reactive-contexts) like `computed` and `effect`.
 
 There are two categories of query: **view queries** and **content queries.**
 
@@ -15,7 +15,7 @@ There are two categories of query: **view queries** and **content queries.**
 
 View queries retrieve results from the elements in the component's _view_ — the elements defined in the component's own template. You can query for a single result with the `viewChild` function.
 
-```typescript {highlight: [14, 15]}
+```angular-ts {highlight: [14, 15]}
 @Component({
   selector: 'custom-card-header',
   /*...*/
@@ -40,7 +40,7 @@ If the query does not find a result, its value is `undefined`. This may occur if
 
 You can also query for multiple results with the `viewChildren` function.
 
-```typescript {highlight: [17]}
+```angular-ts {highlight: [17]}
 @Component({
   selector: 'custom-card-action',
   /*...*/
@@ -51,13 +51,14 @@ export class CustomCardAction {
 
 @Component({
   selector: 'custom-card',
-  template: `<custom-card-action>Save</custom-card-action>
+  template: `
+    <custom-card-action>Save</custom-card-action>
     <custom-card-action>Cancel</custom-card-action>
   `,
 })
 export class CustomCard {
   actions = viewChildren(CustomCardAction);
-  actionsTexts = computed(() => this.actions().map(action => action.text);
+  actionsTexts = computed(() => this.actions().map(action => action.text));
 }
 ```
 
@@ -69,7 +70,7 @@ export class CustomCard {
 
 Content queries retrieve results from the elements in the component's _content_— the elements nested inside the component in the template where it's used. You can query for a single result with the `contentChild` function.
 
-```typescript {highlight: [14, 15]}
+```angular-ts {highlight: [14, 15]}
 @Component({
   selector: 'custom-toggle',
   /*...*/
@@ -106,7 +107,7 @@ By default, content queries find only _direct_ children of the component and do 
 
 You can also query for multiple results with the `contentChildren` function.
 
-```typescript {highlight: [14, 16, 17, 18, 19, 20]}
+```angular-ts {highlight: [14, 16, 17, 18, 19, 20]}
 @Component({
   selector: 'custom-menu-item',
   /*...*/
@@ -147,8 +148,10 @@ If a child query (`viewChild` or `contentChild`) does not find a result, its val
 
 In some cases, especially with `viewChild`, you know with certainty that a specific child is always available. In other cases, you may want to strictly enforce that a specific child is present. For these cases, you can use a _required query_.
 
-```angular-ts
-@Component({/* ... */})
+```ts
+@Component({
+  /* ... */
+})
 export class CustomCard {
   header = viewChild.required(CustomCardHeader);
   body = contentChild.required(CustomCardBody);
@@ -215,8 +218,9 @@ All query functions accept an options object as a second parameter. These option
 By default, the query locator indicates both the element you're searching for and the value retrieved. You can alternatively specify the `read` option to retrieve a different value from the element matched by the locator.
 
 ```ts
-
-@Component({/*...*/})
+@Component({
+  /*...*/
+})
 export class CustomExpando {
   toggle = contentChild(ExpandoContent, {read: TemplateRef});
 }
@@ -232,7 +236,7 @@ Developers most commonly use `read` to retrieve `ElementRef` and `TemplateRef`.
 By default, `contentChildren` queries find only _direct_ children of the component and do not traverse into descendants.
 `contentChild` queries do traverse into descendants by default.
 
-```typescript {highlight: [13, 14, 15, 16]}
+```angular-ts {highlight: [13, 14, 15, 16]}
 @Component({
   selector: 'custom-expando',
   /*...*/
@@ -244,7 +248,8 @@ export class CustomExpando {
 
 @Component({
   selector: 'user-profile',
-  template: `     <custom-expando>
+  template: `
+    <custom-expando>
       <some-other-component>
         <custom-toggle>Show</custom-toggle>
       </some-other-component>
@@ -269,7 +274,7 @@ You can alternatively declare queries by adding the corresponding decorator to a
 
 You can query for a single result with the `@ViewChild` decorator.
 
-```typescript {highlight: [14, 16, 17, 18]}
+```angular-ts {highlight: [14, 16, 17, 18]}
 @Component({
   selector: 'custom-card-header',
   /*...*/
@@ -299,7 +304,7 @@ Angular keeps the result of `@ViewChild` up to date as your application state ch
 
 You can also query for multiple results with the `@ViewChildren` decorator.
 
-```typescript {highlight: [17, 19, 20, 21, 22, 23]}
+```angular-ts {highlight: [17, 19, 20, 21, 22, 23]}
 @Component({
   selector: 'custom-card-action',
   /*...*/
@@ -332,7 +337,7 @@ export class CustomCard {
 
 You can query for a single result with the `@ContentChild` decorator.
 
-```typescript {highlight: [14, 16, 17, 18, 25]}
+```angular-ts {highlight: [15, 16, 17, 18, 19, 26]}
 @Component({
   selector: 'custom-toggle',
   /*...*/
@@ -373,7 +378,7 @@ Angular keeps the result of `@ContentChild` up to date as your application state
 
 You can also query for multiple results with the `@ContentChildren` decorator.
 
-```typescript {highlight: [15, 17, 18, 19, 20, 21]}
+```angular-ts {highlight: [15, 17, 18, 19, 20, 21]}
 @Component({
   selector: 'custom-menu-item',
   /*...*/
