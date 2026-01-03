@@ -129,8 +129,18 @@ const docsIndexer = ai.defineIndexer(
 
 // Parse markdown frontmatter and content
 function parseMarkdown(content: string, filePath: string) {
-  // const lines = content.split('\n'); // Unused
   let title = filePath.split('/').pop()?.replace('.md', '') || 'Untitled';
+  let slug: string | undefined;
+
+  // Extract frontmatter if it exists
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (frontmatterMatch) {
+    const frontmatter = frontmatterMatch[1];
+    const slugMatch = frontmatter.match(/^slug:\s*(.+)$/m);
+    if (slugMatch) {
+      slug = slugMatch[1].trim();
+    }
+  }
 
   // Extract title from first h1 or filename
   const h1Match = content.match(/^#\s+(.+)$/m);
@@ -138,7 +148,7 @@ function parseMarkdown(content: string, filePath: string) {
     title = h1Match[1];
   }
 
-  return { title, content };
+  return { title, content, slug };
 }
 
 // Chunk content into smaller pieces for better retrieval
@@ -193,16 +203,84 @@ function getMarkdownFiles(versionDir: string): string[] {
 }
 
 // Generate URL based on source and path
-function generateUrl(source: DocSource, relativePath: string): string {
+function generateUrl(
+  source: DocSource,
+  relativePath: string,
+  version: string,
+  customSlug?: string,
+): string {
+  // If custom slug is provided, use it
+  if (customSlug) {
+    switch (source) {
+      case 'angular': {
+        const baseUrl =
+          version === 'v21'
+            ? 'https://angular.dev'
+            : `https://${version}.angular.dev`;
+        return `${baseUrl}${customSlug.startsWith('/') ? customSlug : '/' + customSlug}`;
+      }
+      case 'material': {
+        const baseUrl =
+          version === 'v21'
+            ? 'https://material.angular.io'
+            : `https://${version}.material.angular.io`;
+        return `${baseUrl}${customSlug.startsWith('/') ? customSlug : '/' + customSlug}`;
+      }
+      case 'ngrx': {
+        const baseUrl =
+          version === 'v21' ? 'https://ngrx.io' : `https://${version}.ngrx.io`;
+        return `${baseUrl}/guide${customSlug.startsWith('/') ? customSlug : '/' + customSlug}`;
+      }
+      case 'analogjs':
+        return `https://analogjs.org/docs${customSlug.startsWith('/') ? customSlug : '/' + customSlug}`;
+    }
+  }
+
   const pathWithoutExt = relativePath.replace('.md', '');
+  const pathParts = pathWithoutExt.split('/');
 
   switch (source) {
-    case 'angular':
-      return `https://angular.dev/${pathWithoutExt}`;
-    case 'material':
-      return `https://material.angular.io/${pathWithoutExt}`;
-    case 'ngrx':
-      return `https://ngrx.io/guide/${pathWithoutExt}`;
+    case 'angular': {
+      // For Angular docs, use version-specific subdomain (v21 uses main domain, others use v{version}.angular.dev)
+      const baseUrl =
+        version === 'v21'
+          ? 'https://angular.dev'
+          : `https://${version}.angular.dev`;
+
+      // For Angular docs, use only the top-level category and the file name
+      // e.g., "best-practices/runtime-performance/skipping-subtrees" -> "best-practices/skipping-subtrees"
+      if (pathParts.length > 2) {
+        return `${baseUrl}/${pathParts[0]}/${pathParts[pathParts.length - 1]}`;
+      }
+      return `${baseUrl}/${pathWithoutExt}`;
+    }
+    case 'material': {
+      // Material uses version-specific subdomain (v21 uses main domain, others use v{version}.material.angular.io)
+      const baseUrl =
+        version === 'v21'
+          ? 'https://material.angular.io'
+          : `https://${version}.material.angular.io`;
+
+      // Material follows similar pattern - use top-level category and file name
+      // Most material docs are flat, but handle nested structure if present
+      if (pathParts.length > 1) {
+        return `${baseUrl}/guide/${pathParts[pathParts.length - 1]}`;
+      }
+      return `${baseUrl}/guide/${pathWithoutExt}`;
+    }
+    case 'ngrx': {
+      // NgRx uses version-specific subdomain (v21 uses main domain, others use v{version}.ngrx.io)
+      const baseUrl =
+        version === 'v21' ? 'https://ngrx.io' : `https://${version}.ngrx.io`;
+
+      // For ngrx docs, keep only the first level of nesting
+      // e.g., "eslint-plugin/rules/prefer-action-creator" -> "eslint-plugin"
+      // e.g., "router-store/actions" -> "router-store/actions" (2 levels is fine)
+      if (pathParts.length > 2) {
+        return `${baseUrl}/guide/${pathParts[0]}`;
+      }
+      return `${baseUrl}/guide/${pathWithoutExt}`;
+    }
     case 'analogjs':
       return `https://analogjs.org/docs/${pathWithoutExt}`;
     default:
@@ -241,7 +319,7 @@ async function processVersion(
       const relativePath = filePath.replace(versionDir + '/', '');
       const section = relativePath.split('/')[0];
 
-      const { title } = parseMarkdown(content, filePath);
+      const { title, slug } = parseMarkdown(content, filePath);
       const chunks = chunkContent(content);
 
       console.log(`  Processing: ${relativePath} (${chunks.length} chunks)`);
@@ -261,7 +339,7 @@ async function processVersion(
               path: relativePath,
               title,
               section,
-              url: generateUrl(source, relativePath),
+              url: generateUrl(source, relativePath, version, slug),
               tokens: Math.ceil(chunk.length / 4),
             },
           }),

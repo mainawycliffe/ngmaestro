@@ -21,8 +21,8 @@ export const searchAngularDocs = ai.defineTool(
         z.object({
           content: z.string(),
           url: z.string().optional(),
-          version: z.string().optional(),
           title: z.string().optional(),
+          source: z.string().optional(),
         }),
       ),
     }),
@@ -43,6 +43,8 @@ export const searchAngularDocs = ai.defineTool(
       results: docs.map((d) => ({
         content: d.text,
         url: d.metadata?.url,
+        title: d.metadata?.title || d.metadata?.path,
+        source: 'angular',
       })),
     };
   },
@@ -62,6 +64,8 @@ export const searchMaterialDocs = ai.defineTool(
         z.object({
           content: z.string(),
           url: z.string().optional(),
+          title: z.string().optional(),
+          source: z.string().optional(),
         }),
       ),
     }),
@@ -82,6 +86,8 @@ export const searchMaterialDocs = ai.defineTool(
       results: docs.map((d) => ({
         content: d.text,
         url: d.metadata?.url,
+        title: d.metadata?.title || d.metadata?.path,
+        source: 'material',
       })),
     };
   },
@@ -101,6 +107,8 @@ export const searchNgrxDocs = ai.defineTool(
         z.object({
           content: z.string(),
           url: z.string().optional(),
+          title: z.string().optional(),
+          source: z.string().optional(),
         }),
       ),
     }),
@@ -121,6 +129,8 @@ export const searchNgrxDocs = ai.defineTool(
       results: docs.map((d) => ({
         content: d.text,
         url: d.metadata?.url,
+        title: d.metadata?.title || d.metadata?.path,
+        source: 'ngrx',
       })),
     };
   },
@@ -143,6 +153,8 @@ export const searchAnalogJSDocs = ai.defineTool(
         z.object({
           content: z.string(),
           url: z.string().optional(),
+          title: z.string().optional(),
+          source: z.string().optional(),
         }),
       ),
     }),
@@ -162,6 +174,8 @@ export const searchAnalogJSDocs = ai.defineTool(
       results: docs.map((d) => ({
         content: d.text,
         url: d.metadata?.url,
+        title: d.metadata?.title || d.metadata?.path,
+        source: 'analogjs',
       })),
     };
   },

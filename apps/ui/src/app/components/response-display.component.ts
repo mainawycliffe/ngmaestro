@@ -19,6 +19,7 @@ import { BugReportComponent } from './bug-report.component';
 import { ConfidenceIndicatorComponent } from './confidence-indicator.component';
 import { RelatedTopicsComponent } from './related-topics.component';
 import { ShareResultComponent } from './share-result.component';
+import { SourcesComponent } from './sources.component';
 
 interface Interaction {
   question: ChatMessage;
@@ -38,6 +39,7 @@ interface Interaction {
     BugReportComponent,
     ConfidenceIndicatorComponent,
     RelatedTopicsComponent,
+    SourcesComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -163,6 +165,13 @@ interface Interaction {
                   @if (group.answer.confidence?.related_topics?.length) {
                     <app-related-topics
                       [topics]="group.answer.confidence!.related_topics!"
+                    />
+                  }
+
+                  <!-- Sources -->
+                  @if (group.answer.confidence?.sources?.length) {
+                    <app-sources
+                      [sources]="group.answer.confidence!.sources!"
                     />
                   }
 

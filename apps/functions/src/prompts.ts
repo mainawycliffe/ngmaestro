@@ -52,7 +52,8 @@ Use: Standalone components, Signals, @if/@for/@switch, inject(), OnPush, separat
     { "type": "code", "language": "typescript|html|scss|bash", "content": "...", "filename": "optional.ts" }
   ],
   "confidence": { "overall_confidence": 1-10, "docs_confidence": 1-10, "answer_confidence": 1-10 },
-  "related_topics": ["Topic: description", ...]
+  "related_topics": ["Topic: description", ...],
+  "sources": [{ "title": "Doc title", "url": "https://...", "source": "angular|material|ngrx|analogjs" }, ...]
 }
 
 **Block Requirements:**
@@ -70,6 +71,8 @@ Before returning your JSON, verify: ✓ Version APIs match specified Angular ver
 - overall_confidence: min(docs, answer). If docs<5, no code—state "Insufficient docs"
 
 **Related Topics:** 2-4 concepts from docs search only (never invented). Format: "Name: 10-15 word description"
+
+**Sources:** Extract title and url from metadata of ALL retrieved documents used in your answer. Include up to 5 most relevant sources. Deduplicate by URL.
 `;
 
   const modeInstructions = {

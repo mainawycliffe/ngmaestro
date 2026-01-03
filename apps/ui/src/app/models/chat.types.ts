@@ -11,12 +11,19 @@ export interface ModeOption {
   icon: string;
 }
 
+export interface DocSource {
+  title: string;
+  url: string;
+  source: 'angular' | 'material' | 'ngrx' | 'analogjs';
+}
+
 export interface ConfidenceMetadata {
   overall_confidence: number;
   docs_confidence?: number;
   answer_confidence?: number;
   concerns?: string[];
   related_topics?: string[];
+  sources?: DocSource[];
 }
 
 export interface ChatMessage {

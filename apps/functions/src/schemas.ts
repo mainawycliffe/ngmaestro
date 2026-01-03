@@ -63,6 +63,20 @@ export const oracleResponseSchema = z.object({
     .describe(
       '2-4 related Angular concepts/APIs found during docs search that user might explore next',
     ),
+  sources: z
+    .array(
+      z.object({
+        title: z.string().describe('Document title or topic'),
+        url: z.string().describe('Full URL to the documentation page'),
+        source: z
+          .enum(['angular', 'material', 'ngrx', 'analogjs'])
+          .describe('Documentation source'),
+      }),
+    )
+    .optional()
+    .describe(
+      'List of documentation sources used to answer the question. Extract from retrieved docs metadata.',
+    ),
 });
 
 export const oracleOutputSchema = z.object({
