@@ -43,19 +43,41 @@ export const confidenceMetadataSchema = z.object({
 });
 
 export const oracleResponseSchema = z.object({
-  blocks: z.array(
-    z.discriminatedUnion('type', [
-      z.object({ type: z.literal('text'), content: z.string() }),
-      z.object({
-        type: z.literal('code'),
-        language: z.string(),
-        content: z.string(),
-        filename: z.string().optional(),
-      }),
-    ]),
-  ),
+  blocks: z
+    .array(
+      z
+        .discriminatedUnion('type', [
+          z
+            .object({
+              type: z.literal('text').describe('Plain text block'),
+              content: z
+                .string()
+                .describe('The text content, can include markdown formatting'),
+            })
+            .describe('Plain text block with explanations or instructions'),
+          z
+            .object({
+              type: z
+                .literal('code')
+                .describe('Code block with language and optional filename'),
+              language: z
+                .string()
+                .describe('Programming language for syntax highlighting'),
+              content: z.string().describe('The code content'),
+              filename: z
+                .string()
+                .optional()
+                .describe('Optional filename for the code block'),
+            })
+            .describe(
+              'Code block with language, content, and optional filename for context',
+            ),
+        ])
+        .describe('Structured content blocks that make up the response'),
+    )
+    .describe('Structured response blocks with type, content, and metadata'),
   confidence: confidenceMetadataSchema.describe(
-    'Step-by-step confidence scores from reasoning process',
+    'Confidence metrics for different aspects of the response (overall, documentation retrieval, answer quality) and any concerns or limitations',
   ),
   related_topics: z
     .array(z.string())
